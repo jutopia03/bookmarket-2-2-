@@ -1,0 +1,10 @@
+# Eclipse
+/.settings/
+/bin/
+/.target/
+/.classpath
+/.project
+
+# OS
+.DS_Store
+Thumbs.db
