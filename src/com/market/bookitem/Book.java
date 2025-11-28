@@ -5,18 +5,20 @@ public class Book extends Item {
 	private String description;
 	private String category;
 	private String releaseDate;
+	private int stock;
 
 	public Book(String bookId, String name, int unitPrice) {
 		super(bookId, name, unitPrice);
 	}
 
 	public Book(String bookId, String name, int unitPrice, String author, String description, String category,
-			String releaseDate) {
+			String releaseDate,int stock) {
 		super(bookId, name, unitPrice);
 		this.author = author;
 		this.description = description;
 		this.category = category;
 		this.releaseDate = releaseDate;
+		this.stock = stock;
 	}
 
 	public String getBookId() {
@@ -38,7 +40,7 @@ public class Book extends Item {
 	public int getUnitPrice() {
 		return unitPrice;
 	}
-
+	
 	public void setUnitPrice(int unitPrice) {
 		this.unitPrice = unitPrice;
 	}
@@ -74,4 +76,11 @@ public class Book extends Item {
 	public void setReleaseDate(String releaseDate) {
 		this.releaseDate = releaseDate;
 	}
-}
+	
+	public int getStock() {
+		return stock;
+	}
+	public void setStock(int stock){
+		this.stock = stock;
+	}
+	}

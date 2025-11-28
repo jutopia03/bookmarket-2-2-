@@ -110,4 +110,12 @@ public class Cart implements CartInterface {
 	public void setmCartItem(ArrayList<CartItem> mCartItem) {
 		this.mCartItem = mCartItem;
 	}
+	
+	public int getTotalPrice() {
+	    int total = 0;
+	    for (CartItem item : mCartItem) {
+	        total += item.getTotalPrice();   // ← 인스턴스 메서드 호출
+	    }
+	    return total;
+	}
 }
