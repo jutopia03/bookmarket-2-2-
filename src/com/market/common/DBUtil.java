@@ -22,4 +22,18 @@ public class DBUtil {
     public static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(URL, USER, PASSWORD);
     }
+    
+    // DB resource 닫기
+    public static void close(AutoCloseable ac) {
+        if (ac != null) {
+            try {
+                ac.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 }
+
+

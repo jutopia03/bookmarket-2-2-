@@ -12,8 +12,8 @@ public class BookDAO {
     public List<Book> getAllBooks() {
         List<Book> bookList = new ArrayList<>();
 
-        String sql = "SELECT book_id, name, unit_price, author, description, category, release_date FROM book";
-
+        String sql = "SELECT book_id, name, unit_price, author, description, category, release_date,stock FROM book";
+        
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
@@ -27,7 +27,8 @@ public class BookDAO {
                 String description = rs.getString("description");
                 String category = rs.getString("category");
                 String releaseDate = rs.getString("release_date");
-
+                int stock = rs.getInt("stock");
+                
                 // Book 클래스의 두 번째 생성자 사용
                 Book book = new Book(
                         bookId,
@@ -36,7 +37,8 @@ public class BookDAO {
                         author,
                         description,
                         category,
-                        releaseDate
+                        releaseDate,
+                        stock
                 );
 
                 bookList.add(book);
@@ -50,8 +52,9 @@ public class BookDAO {
         return bookList;
     }
     
+    //도서 조회
     public Book getBookById(String bookIdParam) {
-        String sql = "SELECT book_id, name, unit_price, author, description, category, release_date " +
+        String sql = "SELECT book_id, name, unit_price, author, description, category, release_date,stock " +
                      "FROM book WHERE book_id = ?";
 
         try (Connection conn = DBUtil.getConnection();
@@ -69,6 +72,8 @@ public class BookDAO {
                     String description = rs.getString("description");
                     String category = rs.getString("category");
                     String releaseDate = rs.getString("release_date");
+                    int stock = rs.getInt("stock");
+            
 
                     return new Book(
                             bookId,
@@ -77,7 +82,8 @@ public class BookDAO {
                             author,
                             description,
                             category,
-                            releaseDate
+                            releaseDate,
+                            stock
                     );
                 }
             }
@@ -87,6 +93,85 @@ public class BookDAO {
             e.printStackTrace();
         }
         return null;
+    }
+    
+ // 도서 추가
+    public int insertBook(Book book) {
+        String sql = "INSERT INTO book (" +
+                     "book_id, name, unit_price, author, description, category, release_date, stock" +
+                     ") VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, book.getBookId());          
+            pstmt.setString(2, book.getName());            
+            pstmt.setInt(3, book.getUnitPrice());          
+            pstmt.setString(4, book.getAuthor());          
+            pstmt.setString(5, book.getDescription());   
+            pstmt.setString(6, book.getCategory());        
+            pstmt.setString(7, book.getReleaseDate());   
+            pstmt.setInt(8, book.getStock());      
+
+            return pstmt.executeUpdate();  
+
+        } catch (SQLException e) {
+            System.out.println("insertBook 오류");
+            e.printStackTrace();
+        }
+
+        return 0; 
+    }
+ // 도서 수정
+    public int updateBook(Book book) {
+        String sql = "UPDATE book SET " +
+                     "name = ?, " +
+                     "unit_price = ?, " +
+                     "author = ?, " +
+                     "description = ?, " +
+                     "category = ?, " +
+                     "release_date = ?, " +
+                     "stock = ? " +
+                     "WHERE book_id = ?";
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, book.getName());
+            pstmt.setInt(2, book.getUnitPrice());
+            pstmt.setString(3, book.getAuthor());
+            pstmt.setString(4, book.getDescription());
+            pstmt.setString(5, book.getCategory());
+            pstmt.setString(6, book.getReleaseDate());
+            pstmt.setInt(7, book.getStock());   // Book 클래스에 맞게 수정
+            pstmt.setString(8, book.getBookId());      // WHERE 조건 (PK)
+
+            return pstmt.executeUpdate();  // 수정된 행 개수(보통 1)
+
+        } catch (SQLException e) {
+            System.out.println("updateBook 오류");
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+ // 도서 삭제
+    public int deleteBook(String bookId) {
+        String sql = "DELETE FROM book WHERE book_id = ?";
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, bookId);
+
+            return pstmt.executeUpdate();  
+
+        } catch (SQLException e) {
+            System.out.println("deleteBook 오류");
+            e.printStackTrace();
+        }
+
+        return 0;
     }
 
 }

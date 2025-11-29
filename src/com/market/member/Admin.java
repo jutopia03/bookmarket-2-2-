@@ -1,18 +1,28 @@
 package com.market.member;
 
 public class Admin extends Person {
-	private String id = "Admin";
-	private String password = "Admin1234";
 
-	public Admin(String name, int phone) {
-		super(name, phone);
-	}
+    private String username;
+    private String address;    
+    private String role;       
 
-	public String getId() {
-		return id;
-	}
+    public Admin(String username, String name, int phone, String address, String role) {
+        super(name, phone);
+        this.username = username;
+        this.address = address;
+        this.role = role;
+    }
 
-	public String getPassword() {
-		return password;
-	}
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public String getRole() {
+        return role;
+    }
 }

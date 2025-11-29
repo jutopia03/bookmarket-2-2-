@@ -1,6 +1,7 @@
 package com.market.page;
 
 import com.market.member.Admin;
+import com.market.member.MemberDAO;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -72,14 +73,19 @@ public class AdminLoginDialog extends JDialog {
 		okButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
-				Admin admin = new Admin("", -1);
-				System.out.println(pwField.getText() + idField.getText());
-				System.out.println(admin.getId() + admin.getPassword());
-				if (admin.getId().equals(idField.getText()) && admin.getPassword().equals(pwField.getText())) {
-					isLogin = true;
-					dispose();
-				} else
-					JOptionPane.showMessageDialog(okButton, "관리자 정보가 일치하지 않습니다");
+				 String id = idField.getText();
+	                String pw = pwField.getText();
+
+	                MemberDAO memberDAO = new MemberDAO();
+	                Admin admin = memberDAO.loginAdmin(id, pw);
+
+	                if (admin != null) { // DB에서 관리자 정보 찾음 → 로그인 성공
+	                    isLogin = true;
+	                    JOptionPane.showMessageDialog(okButton, "관리자 로그인 성공");
+	                    dispose();
+	                } else {
+	                    JOptionPane.showMessageDialog(okButton, "관리자 정보가 일치하지 않습니다");
+	                }
 			}
 		});
 

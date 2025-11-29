@@ -64,7 +64,8 @@ public class BookInIt {
                         readBook[0], readBook[1],
                         Integer.parseInt(readBook[2]),
                         readBook[3], readBook[4],
-                        readBook[5], readBook[6]
+                        readBook[5], readBook[6],
+                        Integer.parseInt(readBook[7])
                     );
                     booklist.add(bookitem);
                 }
