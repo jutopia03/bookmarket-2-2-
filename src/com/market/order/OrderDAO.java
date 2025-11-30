@@ -6,6 +6,7 @@ import com.market.cart.CartItem;
 import com.market.bookitem.Book;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class OrderDAO {
@@ -90,5 +91,93 @@ public class OrderDAO {
                 } catch (SQLException ignored) {}
             }
         }
+    }
+    public List<Order> getAllOrders() {
+        List<Order> list = new ArrayList<>();
+
+        String sql =
+                "SELECT o.order_id, o.member_id, m.username, " +
+                "       o.total_price, o.order_date, o.status " +
+                "FROM orders o " +
+                "LEFT JOIN member m ON o.member_id = m.member_id " +
+                "ORDER BY o.order_id DESC";
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                int orderId     = rs.getInt("order_id");
+                int memberId    = rs.getInt("member_id");
+                String username = rs.getString("username");
+                int totalPrice  = rs.getInt("total_price");
+                Timestamp orderDate = rs.getTimestamp("order_date");
+                String status   = rs.getString("status");
+
+                Order order = new Order(orderId, memberId, username,
+                                        totalPrice, orderDate, status);
+                list.add(order);
+            }
+
+        } catch (SQLException e) {
+            System.out.println("주문 목록 조회 중 오류");
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    public List<OrderItemView> getOrderItems(int orderId) {
+        List<OrderItemView> list = new ArrayList<>();
+
+        String sql =
+                "SELECT oi.book_id, b.name, oi.quantity, oi.unit_price " +
+                "FROM order_item oi " +
+                "JOIN book b ON oi.book_id = b.book_id " +
+                "WHERE oi.order_id = ?";
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, orderId);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    String bookId = rs.getString("book_id");
+                    String name   = rs.getString("name");
+                    int quantity  = rs.getInt("quantity");
+                    int unitPrice = rs.getInt("unit_price");
+
+                    OrderItemView item =
+                            new OrderItemView(bookId, name, quantity, unitPrice);
+                    list.add(item);
+                }
+            }
+
+        } catch (SQLException e) {
+            System.out.println("주문 상세 조회 중 오류");
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    public int updateOrderStatus(int orderId, String newStatus) {
+        String sql = "UPDATE orders SET status = ? WHERE order_id = ?";
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, newStatus);
+            pstmt.setInt(2, orderId);
+
+            return pstmt.executeUpdate();   // 1 이면 성공
+
+        } catch (SQLException e) {
+            System.out.println("주문 상태 변경 중 오류");
+            e.printStackTrace();
+        }
+
+        return 0;
     }
 }
