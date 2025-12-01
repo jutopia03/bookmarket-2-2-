@@ -2,6 +2,7 @@ package com.market.page;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -14,8 +15,6 @@ import com.market.order.OrderItemView;
 
 public class OrderListPanel extends JPanel {
 
-	private static final Color APP_BG = new Color(246, 249, 253);
-	
     private JTable table;
     private DefaultTableModel model;
 
@@ -31,7 +30,10 @@ public class OrderListPanel extends JPanel {
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
     public OrderListPanel() {
+        // 전체 배경 흰색
         setLayout(new BorderLayout(10, 10));
+        setBackground(Color.WHITE);
+        setOpaque(true);
 
         // ===== 제목 =====
         JLabel title = new JLabel("주문 관리", SwingConstants.CENTER);
@@ -60,28 +62,34 @@ public class OrderListPanel extends JPanel {
 
         // 왼쪽: 정렬
         JPanel sortPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 5));
+        sortPanel.setBackground(Color.WHITE);
         sortPanel.add(new JLabel("정렬:"));
         sortPanel.add(cbSort);
 
-        // 가운데: 검색 + 상태
         JPanel midPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
+        midPanel.setBackground(Color.WHITE);
         midPanel.add(new JLabel("검색:"));
         midPanel.add(cbField);
         midPanel.add(tfKeyword);
         midPanel.add(new JLabel("상태:"));
         midPanel.add(cbStatus);
+
+        midPanel.add(tfKeyword);
         midPanel.add(btnSearch);
 
         // 오른쪽: 초기화
         JPanel resetPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 50, 5));
+        resetPanel.setBackground(Color.WHITE);
         resetPanel.add(btnReset);
 
         JPanel searchPanel = new JPanel(new BorderLayout());
+        searchPanel.setBackground(Color.WHITE);
         searchPanel.add(sortPanel, BorderLayout.WEST);
         searchPanel.add(midPanel, BorderLayout.CENTER);
         searchPanel.add(resetPanel, BorderLayout.EAST);
 
         JPanel northPanel = new JPanel(new BorderLayout());
+        northPanel.setBackground(Color.WHITE);
         northPanel.add(title, BorderLayout.NORTH);
         northPanel.add(searchPanel, BorderLayout.SOUTH);
         add(northPanel, BorderLayout.NORTH);
@@ -99,10 +107,20 @@ public class OrderListPanel extends JPanel {
         };
 
         table = new JTable(model);
-        add(new JScrollPane(table), BorderLayout.CENTER);
+        table.setBackground(Color.WHITE);
+        table.setFillsViewportHeight(true);
+
+        JTableHeader header = table.getTableHeader();
+        header.setBackground(Color.WHITE);
+        header.setForeground(Color.BLACK);
+
+        JScrollPane sp = new JScrollPane(table);
+        sp.getViewport().setBackground(Color.WHITE);
+        add(sp, BorderLayout.CENTER);
 
         // ===== 하단 버튼 =====
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
+        btnPanel.setBackground(Color.WHITE);
         JButton btnDetail = new JButton("주문 상세");
         JButton btnCancel = new JButton("주문 취소");
         JButton btnReload = new JButton("새로고침");

@@ -23,7 +23,7 @@ import com.market.order.Order;
 
 public class MainFrame extends JFrame {
 
-    // 위쪽 전체 영역(인사 + 메뉴), 가운데 페이지 영역
+    // 위쪽 전체 영역(메뉴 + 인사), 가운데 페이지 영역
     private JPanel topPanel;
     private JPanel mMenuPanel;
     private JPanel mPagePanel;
@@ -49,56 +49,50 @@ public class MainFrame extends JFrame {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setIconImage(new ImageIcon("./images/shop.png").getImage());
 
-        // 전체 배경 패널
+        // 전체 배경 패널 (대시보드 흰 배경)
         JPanel content = new JPanel(new BorderLayout());
-        content.setBackground(new Color(246, 249, 253));
+        content.setBackground(Color.WHITE);
         setContentPane(content);
     }
 
-    // 상단 인사 영역 + 메뉴 버튼 영역
+    // 상단 메뉴 + 인사 영역 (검은 바)
     private void initTopArea() {
         topPanel = new JPanel(new BorderLayout());
-        topPanel.setOpaque(false);  // 배경색은 부모 패널 색 사용
+        topPanel.setBackground(Color.BLACK);
+        topPanel.setPreferredSize(new Dimension(0, 60));
+        topPanel.setBorder(
+                BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(220, 220, 220))
+        );
 
-        // ===== 1) 인사 / 날짜 라인 =====
-        JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 20, 5));
-        headerPanel.setOpaque(false);
-
-        greetingLabel = new JLabel(makeGreetingText());
-        greetingLabel.setFont(new Font("함초롬돋움", Font.PLAIN, 12));
-        headerPanel.add(greetingLabel);
-
-        topPanel.add(headerPanel, BorderLayout.NORTH);
-
-        // ===== 2) 메뉴 버튼 줄 =====
-        mMenuPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        // ===== 왼쪽: 메뉴 버튼 줄 =====
+        mMenuPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 15));
         mMenuPanel.setOpaque(false);
-        mMenuPanel.setBorder(new javax.swing.border.EmptyBorder(20, 0, 10, 0));
 
-        Font ft = new Font("함초롬돋움", Font.BOLD, 15);
+        Font menuFont = new Font("함초롬돋움", Font.PLAIN, 14);
 
-        ImageIcon homeIcon   = new ImageIcon("./images/1.png");
-        ImageIcon bookIcon   = new ImageIcon("./images/2.png");
-        ImageIcon memberIcon = new ImageIcon("./images/4.png");
-        ImageIcon orderIcon  = new ImageIcon("./images/5.png");
-        ImageIcon exitIcon   = new ImageIcon("./images/6.png");
-
-        JButton btHome    = new JButton("홈", homeIcon);
-        JButton btBookMng = new JButton("도서 관리", bookIcon);
-        JButton btMember  = new JButton("회원 관리", memberIcon);
-        JButton btOrder   = new JButton("주문 관리", orderIcon);
-        JButton btExit    = new JButton("종료", exitIcon);
+        JButton btHome    = createTopMenuButton("홈", menuFont);
+        JButton btBookMng = createTopMenuButton("도서관리", menuFont);
+        JButton btMember  = createTopMenuButton("회원관리", menuFont);
+        JButton btOrder   = createTopMenuButton("주문관리", menuFont);
+        JButton btExit    = createTopMenuButton("종료", menuFont);
 
         JButton[] btns = { btHome, btBookMng, btMember, btOrder, btExit };
-
         for (JButton b : btns) {
-            b.setFont(ft);
-            b.setHorizontalTextPosition(SwingConstants.RIGHT);
-            b.setVerticalTextPosition(SwingConstants.CENTER);
             mMenuPanel.add(b);
         }
 
-        topPanel.add(mMenuPanel, BorderLayout.SOUTH);
+        topPanel.add(mMenuPanel, BorderLayout.WEST);
+
+        // ===== 오른쪽: 인사/날짜 =====
+        JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 20, 18));
+        rightPanel.setOpaque(false);
+
+        greetingLabel = new JLabel(makeGreetingText());
+        greetingLabel.setFont(new Font("함초롬돋움", Font.PLAIN, 12));
+        greetingLabel.setForeground(Color.WHITE);
+
+        rightPanel.add(greetingLabel);
+        topPanel.add(rightPanel, BorderLayout.EAST);
 
         // Frame의 NORTH에 상단 전체를 붙이기
         getContentPane().add(topPanel, BorderLayout.NORTH);
@@ -121,10 +115,38 @@ public class MainFrame extends JFrame {
         });
     }
 
+    // 상단 메뉴용 플랫 버튼 생성
+    private JButton createTopMenuButton(String text, Font font) {
+        JButton btn = new JButton(text);
+        btn.setFont(font);
+        btn.setForeground(Color.WHITE);
+        btn.setOpaque(false);
+        btn.setContentAreaFilled(false);
+        btn.setBorderPainted(false);
+        btn.setFocusPainted(false);
+        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        // 간단한 호버 효과
+        btn.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btn.setForeground(new Color(180, 200, 255));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btn.setForeground(Color.WHITE);
+            }
+        });
+
+        return btn;
+    }
+
     // 가운데 내용 영역
     private void initPagePanel() {
         mPagePanel = new JPanel(new BorderLayout());
-        mPagePanel.setOpaque(false);
+        mPagePanel.setOpaque(true);
+        mPagePanel.setBackground(Color.WHITE);
         getContentPane().add(mPagePanel, BorderLayout.CENTER);
 
         showHomePage();
@@ -149,12 +171,12 @@ public class MainFrame extends JFrame {
     private JPanel createHomePanel() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setOpaque(false);
-        panel.setBorder(BorderFactory.createEmptyBorder(0, 40, 40, 40));
+        panel.setBorder(BorderFactory.createEmptyBorder(30, 40, 40, 40));
 
         // 상단: 제목 + 구분선
         JPanel titlePanel = new JPanel(new BorderLayout());
         titlePanel.setOpaque(false);
-        titlePanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 30, 0));
+        titlePanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 30, 0));
 
         JLabel title = new JLabel("대시보드", SwingConstants.CENTER);
         title.setFont(new Font("함초롬돋움", Font.BOLD, 26));
@@ -162,6 +184,7 @@ public class MainFrame extends JFrame {
         titlePanel.add(title, BorderLayout.NORTH);
 
         JSeparator line = new JSeparator();
+        line.setForeground(Color.BLACK);
         titlePanel.add(line, BorderLayout.SOUTH);
 
         panel.add(titlePanel, BorderLayout.NORTH);
@@ -171,7 +194,7 @@ public class MainFrame extends JFrame {
         centerWrapper.setOpaque(false);
 
         // 1) 카드 3개
-        JPanel cardPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        JPanel cardPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 40, 10));
         cardPanel.setOpaque(false);
 
         String bookCount   = "-";
@@ -213,11 +236,8 @@ public class MainFrame extends JFrame {
 
         panel.add(centerWrapper, BorderLayout.CENTER);
 
-        // 하단 안내 문구
-        JLabel guide = new JLabel(
-                "",
-                SwingConstants.CENTER
-        );
+        // 하단 안내 문구 (현재는 비워둠)
+        JLabel guide = new JLabel("", SwingConstants.CENTER);
         guide.setFont(new Font("함초롬돋움", Font.PLAIN, 13));
         guide.setBorder(BorderFactory.createEmptyBorder(10, 0, 20, 0));
 
@@ -232,19 +252,19 @@ public class MainFrame extends JFrame {
         Color hoverColor = new Color(235, 242, 255);
 
         JPanel card = new JPanel(new BorderLayout(0, 5));
-        card.setPreferredSize(new Dimension(150, 150));
+        card.setPreferredSize(new Dimension(200, 180));
         card.setBackground(baseColor);
         card.setOpaque(true);
         card.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(200, 200, 200)),
-                BorderFactory.createEmptyBorder(10, 10, 10, 10)
+                BorderFactory.createEmptyBorder(15, 10, 15, 10)
         ));
 
         JLabel lbTitle = new JLabel(title, SwingConstants.CENTER);
-        lbTitle.setFont(new Font("함초롬돋움", Font.BOLD, 13));
+        lbTitle.setFont(new Font("함초롬돋움", Font.BOLD, 14));
 
         JLabel lbValue = new JLabel(value, SwingConstants.CENTER);
-        lbValue.setFont(new Font("함초롬돋움", Font.BOLD, 22));
+        lbValue.setFont(new Font("함초롬돋움", Font.BOLD, 24));
 
         JLabel lbDesc = new JLabel(desc, SwingConstants.CENTER);
         lbDesc.setFont(new Font("함초롬돋움", Font.PLAIN, 11));
@@ -280,14 +300,14 @@ public class MainFrame extends JFrame {
 
     // 재고 2권 이하 도서 목록 패널
     private JPanel createLowStockPanel() {
-    	JPanel panel = new JPanel(new BorderLayout());
-    	panel.setOpaque(false);
-    	panel.setBorder(new TitledBorder(
-    	        BorderFactory.createLineBorder(new Color(180, 180, 180)),
-    	        "재고 부족 도서 (2권 이하)",
-    	        TitledBorder.CENTER,       // ★ 가운데 정렬
-    	        TitledBorder.TOP           // 위치 (상단)
-    	));
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setOpaque(false);
+        panel.setBorder(new TitledBorder(
+                BorderFactory.createLineBorder(new Color(180, 180, 180)),
+                "재고 부족 도서 (2권 이하)",
+                TitledBorder.CENTER,
+                TitledBorder.TOP
+        ));
 
         String[] cols = { "도서ID", "도서명", "재고" };
         DefaultTableModel model = new DefaultTableModel(cols, 0) {
@@ -301,7 +321,7 @@ public class MainFrame extends JFrame {
         try {
             List<Book> all = bookDAO.getAllBooks();
             for (Book b : all) {
-                if (b.getStock() <= 2) {          // ★ 재고 2권 이하
+                if (b.getStock() <= 2) {          // 재고 2권 이하
                     lowStock.add(b);
                     if (lowStock.size() >= 5) {   // 최대 5개만
                         break;
@@ -319,7 +339,14 @@ public class MainFrame extends JFrame {
         }
 
         JTable table = new JTable(model);
+        // ★ 테이블/뷰포트 배경을 전부 흰색으로
+        table.setBackground(Color.WHITE);
+        table.setOpaque(true);
+        table.setFillsViewportHeight(true);
+
         JScrollPane sp = new JScrollPane(table);
+        sp.getViewport().setBackground(Color.WHITE);
+
         panel.add(sp, BorderLayout.CENTER);
 
         if (lowStock.isEmpty()) {
@@ -333,14 +360,14 @@ public class MainFrame extends JFrame {
 
     // 최근 주문 3건 패널
     private JPanel createRecentOrderPanel() {
-    	JPanel panel = new JPanel(new BorderLayout());
-    	panel.setOpaque(false);
-    	panel.setBorder(new TitledBorder(
-    	        BorderFactory.createLineBorder(new Color(180, 180, 180)),
-    	        "최근 주문 3건",
-    	        TitledBorder.CENTER,       // ★ 가운데 정렬
-    	        TitledBorder.TOP
-    	));
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setOpaque(false);
+        panel.setBorder(new TitledBorder(
+                BorderFactory.createLineBorder(new Color(180, 180, 180)),
+                "최근 주문 3건",
+                TitledBorder.CENTER,
+                TitledBorder.TOP
+        ));
 
         String[] cols = { "주문번호", "아이디", "총 금액", "주문일시" };
         DefaultTableModel model = new DefaultTableModel(cols, 0) {
@@ -365,7 +392,14 @@ public class MainFrame extends JFrame {
         } catch (Exception ignored) {}
 
         JTable table = new JTable(model);
+        // ★ 여기도 흰색 배경으로
+        table.setBackground(Color.WHITE);
+        table.setOpaque(true);
+        table.setFillsViewportHeight(true);
+
         JScrollPane sp = new JScrollPane(table);
+        sp.getViewport().setBackground(Color.WHITE);
+
         panel.add(sp, BorderLayout.CENTER);
 
         if (model.getRowCount() == 0) {

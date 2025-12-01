@@ -2,6 +2,7 @@ package com.market.page;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -23,14 +24,18 @@ public class MemberListPanel extends JPanel {
     private JComboBox<String> cbSort;    // 정렬: 아이디/이름 오름/내림
 
     public MemberListPanel() {
+
+        // 전체 배경 흰색
         setLayout(new BorderLayout(10, 10));
+        setBackground(Color.WHITE);
+        setOpaque(true);
 
         // ===== 상단 제목 =====
         JLabel title = new JLabel("회원 관리", SwingConstants.CENTER);
         title.setFont(new Font("함초롬돋움", Font.BOLD, 22));
 
         // ===== 검색/정렬 영역 =====
-        cbField = new JComboBox<>(new String[]{"전체", "아이디", "이름", "역할"});
+        cbField   = new JComboBox<>(new String[]{"전체", "아이디", "이름", "역할"});
         tfKeyword = new JTextField(15);
         JButton btnSearch = new JButton("검색");
         JButton btnReset  = new JButton("초기화");
@@ -41,27 +46,32 @@ public class MemberListPanel extends JPanel {
         });
 
         JPanel searchPanel = new JPanel(new BorderLayout());
+        searchPanel.setBackground(Color.WHITE);
 
         // 왼쪽: 정렬
         JPanel sortPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 5));
+        sortPanel.setBackground(Color.WHITE);
         sortPanel.add(new JLabel("정렬:"));
         sortPanel.add(cbSort);
         searchPanel.add(sortPanel, BorderLayout.WEST);
 
         // 가운데: 검색
         JPanel midPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
+        midPanel.setBackground(Color.WHITE);
         midPanel.add(new JLabel("검색:"));
         midPanel.add(cbField);
         midPanel.add(tfKeyword);
         midPanel.add(btnSearch);
         searchPanel.add(midPanel, BorderLayout.CENTER);
 
-        // 오른쪽: 초기화 (살짝 왼쪽으로 당기고 싶으면 hgap 값 조절하면 됨)
+        // 오른쪽: 초기화
         JPanel resetPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 50, 5));
+        resetPanel.setBackground(Color.WHITE);
         resetPanel.add(btnReset);
         searchPanel.add(resetPanel, BorderLayout.EAST);
 
         JPanel northPanel = new JPanel(new BorderLayout());
+        northPanel.setBackground(Color.WHITE);
         northPanel.add(title, BorderLayout.NORTH);
         northPanel.add(searchPanel, BorderLayout.SOUTH);
         add(northPanel, BorderLayout.NORTH);
@@ -75,11 +85,23 @@ public class MemberListPanel extends JPanel {
                 return false;    // 테이블 직접 편집 금지
             }
         };
+
         table = new JTable(model);
-        add(new JScrollPane(table), BorderLayout.CENTER);
+        table.setBackground(Color.WHITE);
+        table.setFillsViewportHeight(true);
+
+        JTableHeader header = table.getTableHeader();
+        header.setBackground(Color.WHITE);
+        header.setForeground(Color.BLACK);
+
+        JScrollPane sp = new JScrollPane(table);
+        sp.getViewport().setBackground(Color.WHITE);
+        add(sp, BorderLayout.CENTER);
 
         // ===== 하단: 버튼 (상세, 등록, 수정, 삭제, 새로고침) =====
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        btnPanel.setBackground(Color.WHITE);
+
         JButton btnDetail = new JButton("회원 상세");
         JButton btnAdd    = new JButton("회원 등록");
         JButton btnEdit   = new JButton("회원 수정");
@@ -259,16 +281,21 @@ public class MemberListPanel extends JPanel {
     // ================== 회원 등록/수정 폼 ==================
     // origin == null  → 등록,  origin != null → 수정
     private void openMemberForm(Member origin) {
-        JDialog dialog = new JDialog((Frame) null,
-                (origin == null ? "회원 등록" : "회원 수정"), true);
+        JDialog dialog = new JDialog(
+                (Frame) null,
+                (origin == null ? "회원 등록" : "회원 수정"),
+                true
+        );
 
         dialog.setSize(500, 380);
         dialog.setLocationRelativeTo(this);
         dialog.setLayout(new BorderLayout(10, 10));
         dialog.getRootPane().setBorder(
                 BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        dialog.getContentPane().setBackground(Color.WHITE);
 
         JPanel form = new JPanel(new GridLayout(6, 2, 10, 10));
+        form.setBackground(Color.WHITE);
 
         JTextField tfUsername     = new JTextField();
         JPasswordField pfPassword = new JPasswordField();
@@ -303,6 +330,7 @@ public class MemberListPanel extends JPanel {
         }
 
         JPanel bottom = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        bottom.setBackground(Color.WHITE);
         JButton btnSave   = new JButton("저장");
         JButton btnCancel = new JButton("취소");
         bottom.add(btnSave);
