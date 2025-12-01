@@ -208,15 +208,13 @@ public class MainWindow extends JFrame {
 				JFrame frame = new JFrame();
 				adminDialog = new AdminLoginDialog(frame, "관리자 로그인");
 				adminDialog.setVisible(true);
-				if (adminDialog.isLogin) {
-					mPagePanel.removeAll();
-					mPagePanel.add("관리자", new AdminPage(mPagePanel));
-					mPagePanel.revalidate();
-					mPagePanel.repaint();
-				}
-			}
+				
+		        if (adminDialog.isLogin) {
+		            MainWindow.this.setVisible(false);
+		            new MainFrame();
+		        }
+		    }
 		});
-
 	}
 
 	private void initMenu() {
