@@ -2,21 +2,19 @@ package com.market.member;
 
 import com.market.common.DBUtil;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.ArrayList;
+import java.sql.*;
+import java.util.*;
 
 public class MemberDAO {
 
-    // 관리자 로그인
-    public Admin loginAdmin(String username, String password) {
+    // ============================
+    // 사용자 로그인
+    // ============================
+    public User loginUser(String username, String password) {
 
-        String sql = "SELECT username, name, phone, address "
-                   + "FROM member "
-                   + "WHERE username = ? AND password = ? AND role = 'ADMIN'";
+        String sql = "SELECT member_id, username, name, phone, address " +
+                    "FROM member " +
+                    "WHERE username = ? AND password = ? AND role = 'USER'";
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -25,41 +23,77 @@ public class MemberDAO {
             pstmt.setString(2, password);
 
             try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    int memberId    = rs.getInt("member_id");
+                    String name     = rs.getString("name");      // 진짜 회원 이름
+                    String phoneStr = rs.getString("phone");
+                    String address  = rs.getString("address");
 
-            	if (rs.next()) {
+                    int phoneInt = 0;
+                    try {
+                        // 010-1111-2222 같은 형식 제거 후 숫자만
+                        phoneInt = Integer.parseInt(phoneStr.replaceAll("[^0-9]", ""));
+                    } catch (Exception ignored) {}
 
-            	    String dbUsername = rs.getString("username"); 
-            	    String name       = rs.getString("name");
-            	    String phoneStr   = rs.getString("phone");
-            	    String address    = rs.getString("address");
-            	    String role       = "ADMIN"; 
+                // Person(name, phone, address) 에 맞게 생성자 사용
+                    User user = new User(name, phoneInt, address);
+                    user.setMemberId(memberId); // ★ 여기서 memberId 주입
 
-            	    int phoneInt = 0;
-            	    try {
-            	        phoneInt = Integer.parseInt(phoneStr.replaceAll("[^0-9]", ""));
-            	    } catch (Exception ignored) {}
-
-            
-            	    Admin admin = new Admin(
-            	            dbUsername,   
-            	            name,     
-            	            phoneInt,  
-            	            address,     
-            	            role          
-            	    );
-
-            	    return admin;
-            	}
+                    return user;
+                }
             }
-
         } catch (SQLException e) {
-            System.out.println("관리자 로그인 쿼리 오류");
+            System.out.println("사용자 로그인 쿼리 오류");
             e.printStackTrace();
         }
 
-        return null;  // 실패
+    // 로그인 실패
+        return null;
     }
-    // 1) 전체 회원 조회
+
+
+    // ============================
+    // 관리자 로그인
+    // ============================
+    public Admin loginAdmin(String username, String password) {
+        String sql = "SELECT username, name, phone, address " +
+                     "FROM member " +
+                     "WHERE username = ? AND password = ? AND role = 'ADMIN'";
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, username);
+            pstmt.setString(2, password);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    String dbUsername = rs.getString("username");
+                    String name       = rs.getString("name");
+                    String phoneStr   = rs.getString("phone");
+                    String address    = rs.getString("address");
+                    String role       = "ADMIN";
+
+                    int phoneInt = 0;
+                    try {
+                        phoneInt = Integer.parseInt(phoneStr.replaceAll("[^0-9]", ""));
+                    } catch (Exception ignored) {}
+
+                    return new Admin(dbUsername, name, phoneInt, address, role);
+                }
+            }
+
+        } catch (SQLException e) {
+            System.out.println("관리자 로그인 오류");
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    // ============================
+    // 전체 회원 조회
+    // ============================
     public List<Member> getAllMembers() {
         List<Member> members = new ArrayList<>();
 
@@ -72,23 +106,24 @@ public class MemberDAO {
             while (rs.next()) {
                 String username = rs.getString("username");
                 String name     = rs.getString("name");
-                String phone    = rs.getString("phone");    // 문자열 그대로 사용
+                String phone    = rs.getString("phone");
                 String address  = rs.getString("address");
                 String role     = rs.getString("role");
 
-                Member m = new Member(username, name, phone, address, role);
-                members.add(m);
+                members.add(new Member(username, name, phone, address, role));
             }
 
         } catch (SQLException e) {
-            System.out.println("회원 목록 조회 중 오류");
+            System.out.println("회원 목록 오류");
             e.printStackTrace();
         }
 
         return members;
     }
 
-    // 2) 회원 삭제
+    // ============================
+    // 회원 삭제
+    // ============================
     public int deleteMember(String username) {
         String sql = "DELETE FROM member WHERE username = ?";
 
@@ -96,16 +131,19 @@ public class MemberDAO {
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, username);
-            return pstmt.executeUpdate();    // 1이면 성공
+            return pstmt.executeUpdate();
 
         } catch (SQLException e) {
-            System.out.println("회원 삭제 중 오류");
+            System.out.println("회원 삭제 오류");
             e.printStackTrace();
         }
 
         return 0;
     }
- // 3) 회원 등록
+
+    // ============================
+    // 회원 등록 (USER / ADMIN 모두 가능)
+    // ============================
     public int insertMember(String username,
                             String password,
                             String name,
@@ -113,8 +151,7 @@ public class MemberDAO {
                             String address,
                             String role) {
 
-        String sql = "INSERT INTO member " +
-                     "(username, password, name, phone, address, role) " +
+        String sql = "INSERT INTO member (username, password, name, phone, address, role) " +
                      "VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DBUtil.getConnection();
@@ -125,19 +162,21 @@ public class MemberDAO {
             pstmt.setString(3, name);
             pstmt.setString(4, phone);
             pstmt.setString(5, address);
-            pstmt.setString(6, role);   // 'USER' 또는 'ADMIN'
+            pstmt.setString(6, role);
 
-            return pstmt.executeUpdate();  // 1 이면 성공
+            return pstmt.executeUpdate();
 
         } catch (SQLException e) {
-            System.out.println("회원 등록 중 오류");
+            System.out.println("회원 등록 오류");
             e.printStackTrace();
         }
 
         return 0;
     }
 
-    // 4) 회원 수정  (username 기준으로 수정)
+    // ============================
+    // 회원 수정
+    // ============================
     public int updateMember(String username,
                             String password,
                             String name,
@@ -146,11 +185,7 @@ public class MemberDAO {
                             String role) {
 
         String sql = "UPDATE member SET " +
-                     "password = ?, " +
-                     "name = ?, " +
-                     "phone = ?, " +
-                     "address = ?, " +
-                     "role = ? " +
+                     "password = ?, name = ?, phone = ?, address = ?, role = ? " +
                      "WHERE username = ?";
 
         try (Connection conn = DBUtil.getConnection();
@@ -166,7 +201,38 @@ public class MemberDAO {
             return pstmt.executeUpdate();
 
         } catch (SQLException e) {
-            System.out.println("회원 수정 중 오류");
+            System.out.println("회원 수정 오류");
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+
+    // ============================
+    // 회원 가입 (USER 전용)
+    // ============================
+    public int insertMember(String username,
+                            String password,
+                            String name,
+                            String phone,
+                            String address) {
+
+        String sql = "INSERT INTO member (username, password, name, phone, address, role) " +
+                     "VALUES (?, ?, ?, ?, ?, 'USER')";
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, username);
+            pstmt.setString(2, password);
+            pstmt.setString(3, name);
+            pstmt.setString(4, phone);
+            pstmt.setString(5, address);
+
+            return pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            System.out.println("회원 가입 오류");
             e.printStackTrace();
         }
 

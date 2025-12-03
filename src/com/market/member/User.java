@@ -1,6 +1,16 @@
 package com.market.member;
 
 public class User extends Person {
+	private int memberId;
+
+	public int getMemberId() {
+		return memberId;
+	}
+
+	public void setMemberId(int memberId) {
+		this.memberId = memberId;
+	}
+	
 	public User(String name, int phone) {
 		super(name, phone);
 	}
