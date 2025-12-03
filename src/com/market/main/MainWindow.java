@@ -1,21 +1,38 @@
 package com.market.main;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.event.*;
 
 import com.market.page.*;
 import com.market.cart.Cart;
 import com.market.bookitem.BookInIt;
+import com.market.member.User;
+import com.market.member.UserInIt;
+import com.market.page.UserInfoPage;
+
 
 public class MainWindow extends JFrame {
 
+    // 장바구니 객체 (공용)
     static Cart mCart;
+
+    // 메뉴 패널(위), 내용 패널(아래)
     static JPanel mMenuPanel, mPagePanel;
 
     public MainWindow(String title, int x, int y, int width, int height) {
+
+        // 도서 목록 초기화 (DB → 메모리)
+        BookInIt.init();
+
+        mCart = new Cart();
+
         initContainer(title, x, y, width, height);
         initMenu();
+
+        // 최초 화면: 도서 목록
+        showBookListPage();
 
         setVisible(true);
         setResizable(true);
@@ -27,6 +44,7 @@ public class MainWindow extends JFrame {
     // 메인 프레임 기본 설정
     // ============================
     private void initContainer(String title, int x, int y, int width, int height) {
+
         setTitle(title);
         setBounds(x, y, width, height);
         setLayout(null);
@@ -34,15 +52,17 @@ public class MainWindow extends JFrame {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation((screenSize.width - 1000) / 2, (screenSize.height - 750) / 2);
 
+        // 상단 메뉴 영역
         mMenuPanel = new JPanel();
-        mMenuPanel.setBounds(0, 20, width, 130);
-        menuIntroduction();
+        mMenuPanel.setBounds(0, 20, width, 80);       // 높이 80 정도만 사용
         add(mMenuPanel);
 
+        // 가운데 내용 영역
         mPagePanel = new JPanel();
-        mPagePanel.setBounds(0, 150, width, height);
+        mPagePanel.setBounds(0, 100, width, height - 120);  // 나머지 영역
         add(mPagePanel);
 
+        // 창 닫힘 시 프로그램 종료
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent e) {
@@ -52,206 +72,109 @@ public class MainWindow extends JFrame {
     }
 
     // ============================
-    // 상단 버튼 메뉴 (고객기능)
-    // ============================
-    private void menuIntroduction() {
-        mCart = new Cart();
-        Font ft = new Font("함초롬돋움", Font.BOLD, 15);
-
-        JButton bt1 = new JButton("고객 정보 확인하기", new ImageIcon("./images/1.png"));
-        bt1.setFont(ft);
-        mMenuPanel.add(bt1);
-        bt1.addActionListener(e -> {
-            mPagePanel.removeAll();
-            mPagePanel.add("고객 정보 확인", new GuestInfoPage(mPagePanel));
-            mPagePanel.revalidate();
-            mPagePanel.repaint();
-        });
-
-        JButton bt2 = new JButton("장바구니 상품목록보기", new ImageIcon("./images/2.png"));
-        bt2.setFont(ft);
-        mMenuPanel.add(bt2);
-        bt2.addActionListener(e -> {
-            if (mCart.mCartCount == 0)
-                JOptionPane.showMessageDialog(bt2, "장바구니에 항목이 없습니다");
-            else {
-                mPagePanel.removeAll();
-                mPagePanel.add("장바구니 상품 목록", new CartItemListPage(mPagePanel, mCart));
-                mPagePanel.revalidate();
-                mPagePanel.repaint();
-            }
-        });
-
-        JButton bt3 = new JButton("장바구니 비우기", new ImageIcon("./images/3.png"));
-        bt3.setFont(ft);
-        mMenuPanel.add(bt3);
-        bt3.addActionListener(e -> {
-            if (mCart.mCartCount == 0)
-                JOptionPane.showMessageDialog(bt3, "장바구니가 비어 있습니다");
-            else {
-                mPagePanel.removeAll();
-                menuCartClear(bt3);
-                mPagePanel.add("장바구니 비우기", new CartItemListPage(mPagePanel, mCart));
-                mPagePanel.revalidate();
-                mPagePanel.repaint();
-            }
-        });
-
-        JButton bt4 = new JButton("장바구니에 항목추가하기", new ImageIcon("./images/4.png"));
-        bt4.setFont(ft);
-        mMenuPanel.add(bt4);
-        bt4.addActionListener(e -> {
-            mPagePanel.removeAll();
-            BookInIt.init();
-            mPagePanel.add("장바구니 항목 추가", new CartAddItemPage(mPagePanel, mCart));
-            mPagePanel.revalidate();
-            mPagePanel.repaint();
-        });
-
-        JButton bt6 = new JButton("장바구니 항목삭제하기", new ImageIcon("./images/6.png"));
-        bt6.setFont(ft);
-        mMenuPanel.add(bt6);
-        bt6.addActionListener(e -> {
-            if (mCart.mCartCount == 0)
-                JOptionPane.showMessageDialog(bt6, "장바구니가 비어 있습니다");
-            else {
-                mPagePanel.removeAll();
-                CartItemListPage cartList = new CartItemListPage(mPagePanel, mCart);
-
-                if (cartList.mSelectRow == -1)
-                    JOptionPane.showMessageDialog(bt6, "삭제할 항목을 선택하세요");
-                else {
-                    mCart.removeCart(cartList.mSelectRow);
-                    cartList.mSelectRow = -1;
-                }
-
-                mPagePanel.add("항목 삭제", new CartItemListPage(mPagePanel, mCart));
-                mPagePanel.revalidate();
-                mPagePanel.repaint();
-            }
-        });
-
-        JButton bt7 = new JButton("주문하기", new ImageIcon("./images/7.png"));
-        bt7.setFont(ft);
-        mMenuPanel.add(bt7);
-        bt7.addActionListener(e -> {
-            if (mCart.mCartCount == 0)
-                JOptionPane.showMessageDialog(bt7, "장바구니가 비어 있습니다");
-            else {
-                mPagePanel.removeAll();
-                mPagePanel.add("주문 배송지", new CartShippingPage(mPagePanel, mCart));
-                mPagePanel.revalidate();
-                mPagePanel.repaint();
-            }
-        });
-
-        JButton bt8 = new JButton("종료", new ImageIcon("./images/8.png"));
-        bt8.setFont(ft);
-        mMenuPanel.add(bt8);
-        bt8.addActionListener(e -> {
-            int select = JOptionPane.showConfirmDialog(bt8, "쇼핑몰을 종료하시겠습니까?");
-            if (select == 0) System.exit(0);
-        });
-
-        JButton bt9 = new JButton("관리자", new ImageIcon("./images/9.png"));
-        bt9.setFont(ft);
-        mMenuPanel.add(bt9);
-        bt9.addActionListener(e -> {
-            AdminLoginDialog adminDialog = new AdminLoginDialog(this, "관리자 로그인");
-            adminDialog.setVisible(true);
-            if (adminDialog.isLogin) {
-                setVisible(false);
-                new MainFrame();
-            }
-        });
-
-        JButton bt10 = new JButton("내 주문 내역", new ImageIcon("./images/10.png"));
-        bt10.setFont(ft);
-        mMenuPanel.add(bt10);
-
-        bt10.addActionListener(e -> {
-            mPagePanel.removeAll();
-            mPagePanel.add(new MyOrderListPage(mPagePanel));
-            mPagePanel.revalidate();
-            mPagePanel.repaint();
-        });
-
-    }
-
-    // ============================
-    // 상단 메뉴바 (JMenuBar)
+    // 상단 버튼 메뉴
     // ============================
     private void initMenu() {
+
         Font ft = new Font("함초롬돋움", Font.BOLD, 15);
-        JMenuBar menuBar = new JMenuBar();
 
-        JMenu menu01 = new JMenu("고객");
-        menu01.setFont(ft);
-        JMenuItem item01 = new JMenuItem("고객 정보");
-        JMenuItem item11 = new JMenuItem("종료");
-        menu01.add(item01);
-        menu01.add(item11);
-        menuBar.add(menu01);
+        // 버튼 5개: 도서 목록 / 내 정보 / 장바구니 / 주문 내역 / 종료
+        JButton btBookList     = new JButton("도서 목록");
+        JButton btMyInfo       = new JButton("내 정보");
+        JButton btCart         = new JButton("장바구니");
+        JButton btOrderHistory = new JButton("주문 내역");
+        JButton btExit         = new JButton("종료");
 
-        JMenu menu02 = new JMenu("상품");
-        menu02.setFont(ft);
-        JMenuItem item02 = new JMenuItem("상품 목록");
-        menu02.add(item02);
-        menuBar.add(menu02);
+        btBookList.setFont(ft);
+        btMyInfo.setFont(ft);
+        btCart.setFont(ft);
+        btOrderHistory.setFont(ft);
+        btExit.setFont(ft);
 
-        JMenu menu03 = new JMenu("장바구니");
-        menu03.setFont(ft);
-        JMenuItem item03 = new JMenuItem("항목 추가");
-        JMenuItem item04 = new JMenuItem("항목 수량 줄이기");
-        JMenuItem item05 = new JMenuItem("항목 삭제하기");
-        JMenuItem item06 = new JMenuItem("장바구니 비우기");
-        menu03.add(item03);
-        menu03.add(item04);
-        menu03.add(item05);
-        menu03.add(item06);
-        menuBar.add(menu03);
+        // 5개 버튼을 가운데 정렬
+        // Center align 5 buttons horizontally
+        mMenuPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 15));
+        mMenuPanel.add(btBookList);
+        mMenuPanel.add(btMyInfo);
+        mMenuPanel.add(btCart);
+        mMenuPanel.add(btOrderHistory);
+        mMenuPanel.add(btExit);
 
-        JMenu menu04 = new JMenu("주문");
-        menu04.setFont(ft);
-        JMenuItem item07 = new JMenuItem("영수증 표시");
-        menu04.add(item07);
-        menuBar.add(menu04);
+        // ===== 버튼 동작 =====
 
-        setJMenuBar(menuBar);
+        // 1. 도서 목록
+        btBookList.addActionListener(e -> showBookListPage());
 
-        item01.addActionListener(e -> {
-            mPagePanel.removeAll();
-            mPagePanel.add("고객 정보 확인", new GuestInfoPage(mPagePanel));
-            mPagePanel.revalidate();
-        });
+        // 2. 내 정보
+     btMyInfo.addActionListener(e -> {
+         // 메인 페이지 패널 정리
+         mPagePanel.removeAll();
+         mPagePanel.setLayout(new BorderLayout());
 
-        item02.addActionListener(e -> {
-            mPagePanel.removeAll();
-            BookInIt.init();
-            mPagePanel.add("상품 목록", new CartAddItemPage(mPagePanel, mCart));
-            mPagePanel.revalidate();
-        });
+         // 1) 로그인한 사용자 정보 가져오기
+         User loginUser = UserInIt.getmUser();
+         if (loginUser == null) {
+             JOptionPane.showMessageDialog(MainWindow.this, "로그인 정보가 없습니다.");
+             return;
+         }
 
-        item11.addActionListener(e -> {
-            int select = JOptionPane.showConfirmDialog(item11, "쇼핑몰을 종료하시겠습니까?");
-            if (select == 0) System.exit(0);
-        });
-    }
+         // 2) DB에서 사용할 로그인 아이디(user_name) 가져오기
+         //    ↓↓↓ 이 한 줄은 User.java의 실제 getter 이름에 맞게 바꿔야 합니다.
+         //    예: getUser_name(), getUserName(), getId(), getUsername() 등
+         String loginUserName = loginUser.getUsername();  
 
-    // ============================
-    // 장바구니 전체 삭제
-    // ============================
-    private void menuCartClear(JButton button) {
-        if (mCart.mCartCount == 0)
-            JOptionPane.showMessageDialog(button, "장바구니가 비어 있습니다");
-        else {
-            int select = JOptionPane.showConfirmDialog(button, "모든 항목을 삭제하시겠습니까?");
-            if (select == 0) {
-                mCart.deleteBook();
-                JOptionPane.showMessageDialog(button, "장바구니가 모두 삭제되었습니다");
+         
+         // 3) UserInfoPage 생성해서 메인 패널에 올리기
+         UserInfoPage userInfoPage = new UserInfoPage(mPagePanel, loginUserName);
+         mPagePanel.add(userInfoPage, BorderLayout.CENTER);
+
+         mPagePanel.revalidate();
+         mPagePanel.repaint();
+     });
+
+
+
+        // 3. 장바구니
+        btCart.addActionListener(e -> {
+            if (mCart.mCartCount == 0) {
+                JOptionPane.showMessageDialog(btCart, "장바구니에 항목이 없습니다.");
+            } else {
+                mPagePanel.removeAll();
+                mPagePanel.setLayout(new BorderLayout());
+                // 장바구니 화면 (여기서 장바구니 비우기 / 수량± / 항목삭제 / 주문하기 버튼 구현)
+                mPagePanel.add(new CartItemListPage(mPagePanel, mCart), BorderLayout.CENTER);
+                refreshPage();
             }
-        }
+        });
+
+        // 4. 주문 내역
+        btOrderHistory.addActionListener(e -> {
+            mPagePanel.removeAll();
+            mPagePanel.setLayout(new BorderLayout());
+            mPagePanel.add(new MyOrderListPage(mPagePanel), BorderLayout.CENTER);
+            refreshPage();
+        });
+
+        // 5. 종료
+        btExit.addActionListener(e -> {
+            int select = JOptionPane.showConfirmDialog(btExit, "쇼핑몰을 종료하시겠습니까?");
+            if (select == JOptionPane.YES_OPTION) {
+                System.exit(0);
+            }
+        });
     }
 
+    // 도서 목록 화면으로 전환
+    private void showBookListPage() {
+        mPagePanel.removeAll();
+        mPagePanel.setLayout(new BorderLayout());
+        mPagePanel.add(new CartAddItemPage(mPagePanel, mCart), BorderLayout.CENTER);
+        refreshPage();
+    }
 
+    // 패널 새로고침
+    private void refreshPage() {
+        mPagePanel.revalidate();
+        mPagePanel.repaint();
+    }
 }

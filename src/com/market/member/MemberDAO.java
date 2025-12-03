@@ -1,6 +1,7 @@
 package com.market.member;
 
 import com.market.common.DBUtil;
+import com.market.member.User;
 
 import java.sql.*;
 import java.util.*;
@@ -26,18 +27,15 @@ public class MemberDAO {
                 if (rs.next()) {
                     int memberId    = rs.getInt("member_id");
                     String name     = rs.getString("name");      // 진짜 회원 이름
-                    String phoneStr = rs.getString("phone");
+                    String phone = 	rs.getString("phone");
                     String address  = rs.getString("address");
 
-                    int phoneInt = 0;
-                    try {
-                        // 010-1111-2222 같은 형식 제거 후 숫자만
-                        phoneInt = Integer.parseInt(phoneStr.replaceAll("[^0-9]", ""));
-                    } catch (Exception ignored) {}
+                   
 
                 // Person(name, phone, address) 에 맞게 생성자 사용
-                    User user = new User(name, phoneInt, address);
+                    User user = new User(name, phone, address);
                     user.setMemberId(memberId); // ★ 여기서 memberId 주입
+                    user.setUsername(username);
 
                     return user;
                 }
@@ -70,16 +68,12 @@ public class MemberDAO {
                 if (rs.next()) {
                     String dbUsername = rs.getString("username");
                     String name       = rs.getString("name");
-                    String phoneStr   = rs.getString("phone");
+                    String phone     = rs.getString("phone");
                     String address    = rs.getString("address");
                     String role       = "ADMIN";
 
-                    int phoneInt = 0;
-                    try {
-                        phoneInt = Integer.parseInt(phoneStr.replaceAll("[^0-9]", ""));
-                    } catch (Exception ignored) {}
-
-                    return new Admin(dbUsername, name, phoneInt, address, role);
+                    // 전화번호를 int 로 변환하던 코드 삭제
+                    return new Admin(dbUsername, name, phone, address, role);
                 }
             }
 
@@ -238,4 +232,69 @@ public class MemberDAO {
 
         return 0;
     }
+    
+    // username 으로 상세 정보 조회 (비밀번호, 가입일자까지 포함)
+    public User getUserDetail(String username) {
+        String sql =
+            "SELECT member_id, username, password, name, phone, address, reg_date " +
+            "FROM member WHERE username = ?";
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, username);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+
+                    int memberId   = rs.getInt("member_id");
+                    String dbName  = rs.getString("name");
+                    String phone   = rs.getString("phone");
+                    String address = rs.getString("address");
+                    // 필요하면 아래 값도 나중에 사용
+                    // String dbUsername = rs.getString("username");
+                    // String password   = rs.getString("password");
+                    // Timestamp regDate = rs.getTimestamp("reg_date");
+
+                    // ★ 252번 줄 수정
+                    User user = new User(dbName, phone, address);
+
+                    user.setMemberId(memberId);
+                    // username, password, reg_date 를 User 에 넣고 싶으면
+                    // User 클래스에 맞는 setter 가 있을 때만 사용
+                    // 예: user.setUsername(dbUsername);
+                    //      user.setPassword(password);
+                    //      user.setRegDate(regDate);
+
+                    return user;
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("회원 상세 조회 오류");
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+    // 전화번호 / 주소만 수정
+    public int updateUserContact(String username, String phone, String address) {
+        String sql =
+            "UPDATE member SET phone = ?, address = ? WHERE username = ?";
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, phone);
+            pstmt.setString(2, address);
+            pstmt.setString(3, username);
+
+            return pstmt.executeUpdate(); // 1 이상이면 성공
+        } catch (SQLException e) {
+            System.out.println("회원 연락처/주소 수정 오류");
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
 }

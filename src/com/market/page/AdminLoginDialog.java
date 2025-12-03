@@ -71,22 +71,22 @@ public class AdminLoginDialog extends JDialog {
 		buttonPanel.add(cancelBtn);
 
 		okButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+		    public void actionPerformed(ActionEvent e) {
 
-				 String id = idField.getText();
-	                String pw = pwField.getText();
+		        String id = idField.getText();
+		        String pw = pwField.getText();
 
-	                MemberDAO memberDAO = new MemberDAO();
-	                Admin admin = memberDAO.loginAdmin(id, pw);
+		        MemberDAO memberDAO = new MemberDAO();
+		        Admin admin = memberDAO.loginAdmin(id, pw);
 
-	                if (admin != null) { // DB에서 관리자 정보 찾음 → 로그인 성공
-	                    isLogin = true;
-	                    JOptionPane.showMessageDialog(okButton, "관리자 로그인 성공");
-	                    dispose();
-	                } else {
-	                    JOptionPane.showMessageDialog(okButton, "관리자 정보가 일치하지 않습니다");
-	                }
-			}
+		        if (admin != null) {
+		            // 로그인 성공
+		            isLogin = true;   // 성공 여부만 기록
+		            dispose();        // 다이얼로그만 닫기
+		        } else {
+		            JOptionPane.showMessageDialog(okButton, "관리자 정보가 일치하지 않습니다");
+		        }
+		    }
 		});
 
 		cancelBtn.addActionListener(new ActionListener() {
