@@ -26,15 +26,12 @@ public class MemberDAO {
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     int memberId    = rs.getInt("member_id");
-                    String name     = rs.getString("name");      // 진짜 회원 이름
+                    String name     = rs.getString("name");   
                     String phone = 	rs.getString("phone");
                     String address  = rs.getString("address");
 
-                   
-
-                // Person(name, phone, address) 에 맞게 생성자 사용
                     User user = new User(name, phone, address);
-                    user.setMemberId(memberId); // ★ 여기서 memberId 주입
+                    user.setMemberId(memberId); 
                     user.setUsername(username);
 
                     return user;
@@ -72,7 +69,6 @@ public class MemberDAO {
                     String address    = rs.getString("address");
                     String role       = "ADMIN";
 
-                    // 전화번호를 int 로 변환하던 코드 삭제
                     return new Admin(dbUsername, name, phone, address, role);
                 }
             }
@@ -251,21 +247,11 @@ public class MemberDAO {
                     String dbName  = rs.getString("name");
                     String phone   = rs.getString("phone");
                     String address = rs.getString("address");
-                    // 필요하면 아래 값도 나중에 사용
-                    // String dbUsername = rs.getString("username");
-                    // String password   = rs.getString("password");
-                    // Timestamp regDate = rs.getTimestamp("reg_date");
 
-                    // ★ 252번 줄 수정
                     User user = new User(dbName, phone, address);
 
                     user.setMemberId(memberId);
-                    // username, password, reg_date 를 User 에 넣고 싶으면
-                    // User 클래스에 맞는 setter 가 있을 때만 사용
-                    // 예: user.setUsername(dbUsername);
-                    //      user.setPassword(password);
-                    //      user.setRegDate(regDate);
-
+                    
                     return user;
                 }
             }
@@ -289,7 +275,7 @@ public class MemberDAO {
             pstmt.setString(2, address);
             pstmt.setString(3, username);
 
-            return pstmt.executeUpdate(); // 1 이상이면 성공
+            return pstmt.executeUpdate(); 
         } catch (SQLException e) {
             System.out.println("회원 연락처/주소 수정 오류");
             e.printStackTrace();

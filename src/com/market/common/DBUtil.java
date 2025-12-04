@@ -23,7 +23,6 @@ public class DBUtil {
         return DriverManager.getConnection(URL, USER, PASSWORD);
     }
     
-    // DB resource 닫기
     public static void close(AutoCloseable ac) {
         if (ac != null) {
             try {

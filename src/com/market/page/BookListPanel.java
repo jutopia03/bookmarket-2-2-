@@ -244,7 +244,6 @@ public class BookListPanel extends JPanel {
     }
 
     private void openBookForm(Book origin) {
-        // 그대로 (코드 너무 길어서 생략)
-        // → 기존 코드 사용하면 됨 (버튼 스타일 없음)
+
     }
 }

@@ -19,13 +19,12 @@ public class MemberListPanel extends JPanel {
     private MemberDAO memberDAO = new MemberDAO();
     private List<Member> allMembers = new ArrayList<>();
 
-    private JComboBox<String> cbField;   // 검색필드: 전체/아이디/이름/역할
-    private JTextField tfKeyword;        // 검색어
-    private JComboBox<String> cbSort;    // 정렬: 아이디/이름 오름/내림
+    private JComboBox<String> cbField;   
+    private JTextField tfKeyword;       
+    private JComboBox<String> cbSort;   
 
     public MemberListPanel() {
 
-        // 전체 배경 흰색
         setLayout(new BorderLayout(10, 10));
         setBackground(Color.WHITE);
         setOpaque(true);
@@ -82,7 +81,7 @@ public class MemberListPanel extends JPanel {
         model = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false;    // 테이블 직접 편집 금지
+                return false;   
             }
         };
 
@@ -195,7 +194,7 @@ public class MemberListPanel extends JPanel {
                 case "역할":
                     target = m.getRole();
                     break;
-                default: // 전체
+                default:
                     target = (m.getUsername() + " " + m.getName() + " " + m.getRole());
             }
 

@@ -94,7 +94,6 @@ public class MainFrame extends JFrame {
         rightPanel.add(greetingLabel);
         topPanel.add(rightPanel, BorderLayout.EAST);
 
-        // Frame의 NORTH에 상단 전체를 붙이기
         getContentPane().add(topPanel, BorderLayout.NORTH);
 
         // 버튼 액션
@@ -126,7 +125,6 @@ public class MainFrame extends JFrame {
         btn.setFocusPainted(false);
         btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-        // 간단한 호버 효과
         btn.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
@@ -229,14 +227,13 @@ public class MainFrame extends JFrame {
         infoPanel.setOpaque(false);
         infoPanel.setBorder(BorderFactory.createEmptyBorder(30, 0, 0, 0));
 
-        infoPanel.add(createLowStockPanel());    // 재고 2권 이하 도서
-        infoPanel.add(createRecentOrderPanel()); // 최근 주문 3건
+        infoPanel.add(createLowStockPanel());    
+        infoPanel.add(createRecentOrderPanel());
 
         centerWrapper.add(infoPanel, BorderLayout.CENTER);
 
         panel.add(centerWrapper, BorderLayout.CENTER);
 
-        // 하단 안내 문구 (현재는 비워둠)
         JLabel guide = new JLabel("", SwingConstants.CENTER);
         guide.setFont(new Font("함초롬돋움", Font.PLAIN, 13));
         guide.setBorder(BorderFactory.createEmptyBorder(10, 0, 20, 0));
@@ -273,7 +270,6 @@ public class MainFrame extends JFrame {
         card.add(lbValue, BorderLayout.CENTER);
         card.add(lbDesc, BorderLayout.SOUTH);
 
-        // 클릭 / 호버 이벤트
         card.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
@@ -321,9 +317,9 @@ public class MainFrame extends JFrame {
         try {
             List<Book> all = bookDAO.getAllBooks();
             for (Book b : all) {
-                if (b.getStock() <= 2) {          // 재고 2권 이하
+                if (b.getStock() <= 2) {        
                     lowStock.add(b);
-                    if (lowStock.size() >= 5) {   // 최대 5개만
+                    if (lowStock.size() >= 5) {   
                         break;
                     }
                 }
@@ -339,7 +335,6 @@ public class MainFrame extends JFrame {
         }
 
         JTable table = new JTable(model);
-        // ★ 테이블/뷰포트 배경을 전부 흰색으로
         table.setBackground(Color.WHITE);
         table.setOpaque(true);
         table.setFillsViewportHeight(true);
@@ -378,7 +373,7 @@ public class MainFrame extends JFrame {
         };
 
         try {
-            List<Order> orders = orderDAO.getAllOrders(); // order_id DESC 정렬이라고 가정
+            List<Order> orders = orderDAO.getAllOrders(); 
             int limit = Math.min(3, orders.size());
             for (int i = 0; i < limit; i++) {
                 Order o = orders.get(i);
@@ -392,7 +387,6 @@ public class MainFrame extends JFrame {
         } catch (Exception ignored) {}
 
         JTable table = new JTable(model);
-        // ★ 여기도 흰색 배경으로
         table.setBackground(Color.WHITE);
         table.setOpaque(true);
         table.setFillsViewportHeight(true);
@@ -413,7 +407,7 @@ public class MainFrame extends JFrame {
 
     // ===== 각 화면 전환 메서드 =====
     private void showHomePage() {
-        greetingLabel.setText(makeGreetingText());  // 날짜 갱신
+        greetingLabel.setText(makeGreetingText()); 
         setPage(createHomePanel());
     }
 

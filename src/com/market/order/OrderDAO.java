@@ -38,7 +38,7 @@ public class OrderDAO {
 
         try {
             conn = DBUtil.getConnection();
-            conn.setAutoCommit(false); // 트랜잭션 시작
+            conn.setAutoCommit(false); 
 
             // 0) 장바구니 아이템들 재고 확인
             List<CartItem> cartItems = cart.getmCartItem();

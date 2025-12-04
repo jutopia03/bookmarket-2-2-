@@ -37,7 +37,7 @@ public class DAOTest {
                 "테스트 설명",
                 "IT",
                 "2025-01-01",
-                50      // 재고 (Book 생성자에 맞게 조정)
+                50      
         );
         
         int inserted = dao.insertBook(temp);

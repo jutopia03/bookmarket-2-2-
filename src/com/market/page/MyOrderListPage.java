@@ -2,6 +2,9 @@ package com.market.page;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -19,28 +22,62 @@ public class MyOrderListPage extends JPanel {
     private OrderDAO orderDAO = new OrderDAO();
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
-    public MyOrderListPage(JPanel panel) {
+    public MyOrderListPage(JPanel parent) {
 
-        setLayout(new BorderLayout(10, 10));
+        setLayout(new BorderLayout());
+        setBackground(new Color(245, 245, 245));
+        setBorder(new EmptyBorder(30, 40, 40, 40));
 
-        // --------------------------
-        // 제목
-        // --------------------------
-        JLabel title = new JLabel("내 주문 내역", SwingConstants.CENTER);
-        title.setFont(new Font("함초롬돋움", Font.BOLD, 22));
+        Font titleFont = new Font("함초롬돋움", Font.BOLD, 24);
+        Font subFont   = new Font("함초롬돋움", Font.PLAIN, 12);
+        Font btnFont   = new Font("함초롬돋움", Font.BOLD, 14);
+        Font tableFont = new Font("함초롬돋움", Font.PLAIN, 13);
 
-        JPanel titlePanel = new JPanel(new BorderLayout());
-        titlePanel.setBackground(UIManager.getColor("Panel.background"));
-        titlePanel.add(title, BorderLayout.CENTER);
+        // 상단 타이틀
+        JLabel titleLabel = new JLabel("내 주문 내역");
+        titleLabel.setFont(titleFont);
+
+        JLabel subLabel = new JLabel("내가 주문한 내역을 확인할 수 있습니다.");
+        subLabel.setFont(subFont);
+        subLabel.setForeground(new Color(120, 120, 120));
+
+        JPanel titlePanel = new JPanel();
+        titlePanel.setLayout(new BoxLayout(titlePanel, BoxLayout.Y_AXIS));
+        titlePanel.setBackground(getBackground());
+        titlePanel.add(titleLabel);
+        titlePanel.add(Box.createVerticalStrut(5));
+        titlePanel.add(subLabel);
+        titlePanel.add(Box.createVerticalStrut(10));
+
+        JSeparator sep = new JSeparator();
+        sep.setForeground(new Color(220, 220, 220));
+        titlePanel.add(sep);
 
         add(titlePanel, BorderLayout.NORTH);
 
-        // --------------------------
-        // 테이블
-        // --------------------------
-        String[] columns = {
-                "주문번호", "총 금액", "주문일시", "상태"
-        };
+        // 중앙: 흰 카드 + 테이블
+        JPanel centerWrapper = new JPanel(new GridBagLayout());
+        centerWrapper.setOpaque(false);
+        centerWrapper.setBorder(new EmptyBorder(30, 0, 0, 0));
+        add(centerWrapper, BorderLayout.CENTER);
+
+        JPanel card = new JPanel(new BorderLayout());
+        card.setBackground(Color.WHITE);
+        card.setBorder(BorderFactory.createCompoundBorder(
+                new LineBorder(new Color(225, 225, 225)),
+                new EmptyBorder(20, 30, 20, 30)
+        ));
+
+        GridBagConstraints gbcCard = new GridBagConstraints();
+        gbcCard.gridx = 0;
+        gbcCard.gridy = 0;
+        gbcCard.weightx = 1.0;
+        gbcCard.weighty = 1.0;
+        gbcCard.fill = GridBagConstraints.BOTH;
+        gbcCard.anchor = GridBagConstraints.NORTH;
+        centerWrapper.add(card, gbcCard);
+
+        String[] columns = { "주문번호", "총 금액", "주문일시", "상태" };
 
         model = new DefaultTableModel(columns, 0) {
             @Override
@@ -50,43 +87,50 @@ public class MyOrderListPage extends JPanel {
         };
 
         table = new JTable(model);
+        table.setFont(tableFont);
+        table.setRowHeight(26);
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table.setShowVerticalLines(false);
+        table.setShowHorizontalLines(true);
+        table.setGridColor(new Color(235, 235, 235));
+        table.setIntercellSpacing(new Dimension(0, 1));
 
-        // ★ 테이블이 차지할 '보이는 영역' 크기 설정
-        // (실제 데이터 행 수와는 상관없이, 기본 보이는 크기)
-        table.setPreferredScrollableViewportSize(new Dimension(700, 250));
+        JTableHeader header = table.getTableHeader();
+        header.setFont(new Font("함초롬돋움", Font.BOLD, 13));
+        header.setBackground(new Color(248, 248, 248));
+        header.setForeground(new Color(70, 70, 70));
+        header.setReorderingAllowed(false);
+        header.setPreferredSize(new Dimension(header.getPreferredSize().width, 30));
+        header.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(220, 220, 220)));
 
         JScrollPane sp = new JScrollPane(table);
+        sp.setBorder(new EmptyBorder(0, 0, 0, 0));
+        sp.getViewport().setBackground(Color.WHITE);
+        sp.setPreferredSize(new Dimension(700, 260));
 
-        // ★ 테두리(선) 완전히 제거
-        sp.setBorder(BorderFactory.createEmptyBorder());
-        sp.getViewport().setBorder(null);
+        card.add(sp, BorderLayout.CENTER);
 
-        // ★ BorderLayout.CENTER에 바로 넣지 말고
-        //    가운데 패널(FlowLayout)에 넣어서 크기를 그대로 사용하게 함
-        JPanel centerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 10));
-        centerPanel.setBackground(UIManager.getColor("Panel.background"));
-        centerPanel.add(sp);
-
-        add(centerPanel, BorderLayout.CENTER);
-
-        // --------------------------
         // 하단 버튼
-        // --------------------------
-        JPanel btnPanel = new JPanel();
-        btnPanel.setBackground(UIManager.getColor("Panel.background"));
-        btnPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 20, 0));
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setOpaque(false);
+        bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
+        bottomPanel.setBorder(new EmptyBorder(20, 0, 0, 0));
 
         JButton btnDetail = new JButton("주문 상세 보기");
-        btnDetail.setPreferredSize(new Dimension(160, 45));
-        btnDetail.setFont(new Font("함초롬돋움", Font.BOLD, 14));
+        btnDetail.setFont(btnFont);
+        btnDetail.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnDetail.setPreferredSize(new Dimension(160, 40));
+        btnDetail.setMaximumSize(new Dimension(160, 40));
+        btnDetail.setBackground(new Color(255, 107, 0));
+        btnDetail.setForeground(Color.WHITE);
+        btnDetail.setFocusPainted(false);
+        btnDetail.setBorderPainted(false);
+        btnDetail.setContentAreaFilled(true);
+        btnDetail.setOpaque(true);
 
-        btnPanel.add(btnDetail);
+        bottomPanel.add(btnDetail);
+        add(bottomPanel, BorderLayout.SOUTH);
 
-        add(btnPanel, BorderLayout.SOUTH);
-
-        // --------------------------
-        // 상세보기 동작
-        // --------------------------
         btnDetail.addActionListener(e -> showDetail());
 
         loadMyOrders();
@@ -96,12 +140,10 @@ public class MyOrderListPage extends JPanel {
         model.setRowCount(0);
 
         int memberId = UserInIt.getmUser().getMemberId();
-
         List<Order> myOrders = orderDAO.getOrdersByMember(memberId);
 
         for (Order o : myOrders) {
             String dateStr = (o.getOrderDate() != null) ? sdf.format(o.getOrderDate()) : "";
-
             model.addRow(new Object[]{
                     o.getOrderId(),
                     o.getTotalPrice(),

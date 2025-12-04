@@ -3,7 +3,7 @@ package com.market.member;
 public class User extends Person {
 
     private int memberId;
-    private String username;  // ← 로그인 아이디 저장용 필드 추가**
+    private String username;  
 
     public User(String name, String phone) {
         super(name, phone);
@@ -11,7 +11,7 @@ public class User extends Person {
 
     public User(String username, String phone, String address) {
         super(username, phone, address);
-        this.username = username;  // 생성자에서 username 필드도 채움**
+        this.username = username; 
     }
 
     public int getMemberId() {
@@ -22,7 +22,6 @@ public class User extends Person {
         this.memberId = memberId;
     }
 
-    // === username getter / setter 추가 ===
     public String getUsername() {
         return username;
     }

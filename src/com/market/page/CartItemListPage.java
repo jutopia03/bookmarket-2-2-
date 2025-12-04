@@ -7,9 +7,13 @@ import java.awt.*;
 import java.util.ArrayList;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 
 public class CartItemListPage extends JPanel {
 
@@ -27,12 +31,12 @@ public class CartItemListPage extends JPanel {
         this.mCart = cart;
 
         Font ft = new Font("함초롬돋움", Font.BOLD, 15);
+        Font baseFont = new Font("함초롬돋움", Font.PLAIN, 14);
 
         setLayout(new BorderLayout());
+        setBackground(new Color(245, 245, 245));
+        setBorder(new EmptyBorder(30, 40, 40, 40));
 
-        // ============================
-        // 테이블 데이터 준비
-        // ============================
         ArrayList<CartItem> cartItem = mCart.getmCartItem();
         Object[][] content = new Object[cartItem.size()][tableHeader.length];
         int totalPrice = 0;
@@ -47,47 +51,84 @@ public class CartItemListPage extends JPanel {
             totalPrice += item.getTotalPrice();
         }
 
-        // ============================
-        // 상단: 제목 + 총금액 표시
-        // ============================
-        JLabel titleLabel = new JLabel("장바구니", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("함초롬돋움", Font.BOLD, 22));
+        // 상단 타이틀
+        JLabel titleLabel = new JLabel("장바구니");
+        titleLabel.setFont(new Font("함초롬돋움", Font.BOLD, 24));
 
-        JPanel totalPricePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 10));
-        JLabel totalPricelabel = new JLabel("총금액: " + totalPrice + " 원");
-        totalPricelabel.setForeground(Color.red);
-        totalPricelabel.setFont(ft);
-        totalPricePanel.add(totalPricelabel);
+        JLabel subLabel = new JLabel("담겨 있는 도서를 확인하고 수량을 조정한 뒤 주문할 수 있습니다.");
+        subLabel.setFont(new Font("함초롬돋움", Font.PLAIN, 12));
+        subLabel.setForeground(new Color(120, 120, 120));
 
-        JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.add(titleLabel, BorderLayout.NORTH);
-        topPanel.add(totalPricePanel, BorderLayout.SOUTH);
+        JPanel titlePanel = new JPanel();
+        titlePanel.setLayout(new BoxLayout(titlePanel, BoxLayout.Y_AXIS));
+        titlePanel.setBackground(getBackground());
+        titlePanel.add(titleLabel);
+        titlePanel.add(Box.createVerticalStrut(5));
+        titlePanel.add(subLabel);
+        titlePanel.add(Box.createVerticalStrut(10));
 
-        add(topPanel, BorderLayout.NORTH);
+        JSeparator sep = new JSeparator();
+        sep.setForeground(new Color(220, 220, 220));
+        titlePanel.add(sep);
 
-        // ============================
-        // 가운데: 장바구니 테이블 (크기 축소 + 테두리 제거)
-        // ============================
-        cartTable = new JTable(content, tableHeader);
-        JScrollPane jScrollPane = new JScrollPane(cartTable);
+        add(titlePanel, BorderLayout.NORTH);
 
-        // ★★★ 모든 테두리 제거 ★★★
-        jScrollPane.setBorder(BorderFactory.createEmptyBorder());  // JScrollPane 외곽선 제거
-        jScrollPane.getViewport().setBorder(null);                 // Viewport 내부선 제거
-        cartTable.setBorder(null);                                 // JTable 외곽선 제거
- 
-        
-        // ★ 테이블 전체 크기 줄이기
-        jScrollPane.setPreferredSize(new Dimension(700, 160));
-
-        // ★ 가운데 정렬용 wrapper
-        JPanel centerWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 20));
-        centerWrapper.setBackground(getBackground());
-        centerWrapper.add(jScrollPane);
-
+        // 중앙 영역: 총금액 + 카드형 테이블
+        JPanel centerWrapper = new JPanel(new BorderLayout());
+        centerWrapper.setOpaque(false);
+        centerWrapper.setBorder(new EmptyBorder(30, 0, 0, 0));
         add(centerWrapper, BorderLayout.CENTER);
 
-        // 테이블 클릭 시 행 선택 저장
+        JLabel totalPriceLabel = new JLabel("총금액: " + totalPrice + " 원");
+        totalPriceLabel.setFont(ft);
+        totalPriceLabel.setForeground(Color.RED);
+
+        JPanel totalPricePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+        totalPricePanel.setOpaque(false);
+        totalPricePanel.add(totalPriceLabel);
+        centerWrapper.add(totalPricePanel, BorderLayout.NORTH);
+
+        JPanel tableCard = new JPanel(new BorderLayout());
+        tableCard.setBackground(Color.WHITE);
+        tableCard.setBorder(BorderFactory.createCompoundBorder(
+                new LineBorder(new Color(225, 225, 225)),
+                new EmptyBorder(15, 15, 15, 15)
+        ));
+        centerWrapper.add(tableCard, BorderLayout.CENTER);
+
+        cartTable = new JTable(content, tableHeader) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        cartTable.setFont(baseFont);
+        cartTable.setRowHeight(26);
+        cartTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        cartTable.setShowVerticalLines(false);
+        cartTable.setShowHorizontalLines(true);
+        cartTable.setGridColor(new Color(235, 235, 235));
+        cartTable.setIntercellSpacing(new Dimension(0, 1));
+
+        JTableHeader header = cartTable.getTableHeader();
+        header.setFont(new Font("함초롬돋움", Font.BOLD, 13));
+        header.setBackground(new Color(248, 248, 248));
+        header.setForeground(new Color(70, 70, 70));
+        header.setReorderingAllowed(false);
+        header.setPreferredSize(new Dimension(header.getPreferredSize().width, 30));
+        header.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(220, 220, 220)));
+
+        CartTableCellRenderer cellRenderer = new CartTableCellRenderer();
+        for (int i = 0; i < cartTable.getColumnModel().getColumnCount(); i++) {
+            cartTable.getColumnModel().getColumn(i).setCellRenderer(cellRenderer);
+        }
+
+        JScrollPane jScrollPane = new JScrollPane(cartTable);
+        jScrollPane.getViewport().setBackground(Color.WHITE);
+        jScrollPane.setBorder(new EmptyBorder(0, 0, 0, 0));
+
+        tableCard.add(jScrollPane, BorderLayout.CENTER);
+
         cartTable.addMouseListener(new MouseListener() {
             public void mouseClicked(MouseEvent e) {
                 mSelectRow = cartTable.getSelectedRow();
@@ -98,17 +139,50 @@ public class CartItemListPage extends JPanel {
             public void mouseExited(MouseEvent e) {}
         });
 
-        // ============================
-        // 하단: 버튼 5개
-        // ============================
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 25, 0));
-        add(buttonPanel, BorderLayout.SOUTH);
+        // 하단 버튼
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setOpaque(false);
+        bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
+        bottomPanel.setBorder(new EmptyBorder(20, 0, 0, 0));
 
-        // 1) 장바구니 비우기
+        JPanel buttonRow = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
+        buttonRow.setOpaque(false);
+
         JButton clearButton = new JButton("장바구니 비우기");
-        clearButton.setFont(ft);
-        buttonPanel.add(clearButton);
+        JButton plusButton = new JButton("수량 증가");
+        JButton minusButton = new JButton("수량 감소");
+        JButton removeButton = new JButton("항목 삭제");
+        JButton orderButton = new JButton("주문하기");
+
+        JButton[] grayButtons = { clearButton, plusButton, minusButton, removeButton };
+        for (JButton b : grayButtons) {
+            b.setFont(ft);
+            b.setPreferredSize(new Dimension(130, 36));
+            b.setFocusPainted(false);
+            b.setBackground(new Color(245, 245, 245));
+            b.setForeground(new Color(60, 60, 60));
+            b.setBorder(new LineBorder(new Color(210, 210, 210)));
+            b.setContentAreaFilled(true);
+            b.setOpaque(true);
+        }
+
+        orderButton.setFont(ft);
+        orderButton.setPreferredSize(new Dimension(130, 36));
+        orderButton.setFocusPainted(false);
+        orderButton.setBackground(new Color(255, 107, 0));
+        orderButton.setForeground(Color.WHITE);
+        orderButton.setBorderPainted(false);
+        orderButton.setContentAreaFilled(true);
+        orderButton.setOpaque(true);
+
+        buttonRow.add(clearButton);
+        buttonRow.add(plusButton);
+        buttonRow.add(minusButton);
+        buttonRow.add(removeButton);
+        buttonRow.add(orderButton);
+
+        bottomPanel.add(buttonRow);
+        add(bottomPanel, BorderLayout.SOUTH);
 
         clearButton.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -121,7 +195,7 @@ public class CartItemListPage extends JPanel {
 
                         TableModel tableModel = new DefaultTableModel(new Object[0][0], tableHeader);
                         cartTable.setModel(tableModel);
-                        totalPricelabel.setText("총금액: 0 원");
+                        totalPriceLabel.setText("총금액: 0 원");
 
                         JOptionPane.showMessageDialog(clearButton, "장바구니의 모든 항목을 삭제했습니다");
 
@@ -131,11 +205,6 @@ public class CartItemListPage extends JPanel {
                 }
             }
         });
-
-        // 2) 수량 증가
-        JButton plusButton = new JButton("수량 증가");
-        plusButton.setFont(ft);
-        buttonPanel.add(plusButton);
 
         plusButton.addActionListener(new AbstractAction() {
             @Override
@@ -153,14 +222,9 @@ public class CartItemListPage extends JPanel {
                 CartItem item = mCart.getmCartItem().get(mSelectRow);
                 item.setQuantity(item.getQuantity() + 1);
 
-                refreshTable(cartTable, totalPricelabel, mCart);
+                refreshTable(cartTable, totalPriceLabel, mCart);
             }
         });
-
-        // 3) 수량 감소
-        JButton minusButton = new JButton("수량 감소");
-        minusButton.setFont(ft);
-        buttonPanel.add(minusButton);
 
         minusButton.addActionListener(new AbstractAction() {
             @Override
@@ -187,14 +251,9 @@ public class CartItemListPage extends JPanel {
                     item.setQuantity(item.getQuantity() - 1);
                 }
 
-                refreshTable(cartTable, totalPricelabel, mCart);
+                refreshTable(cartTable, totalPriceLabel, mCart);
             }
         });
-
-        // 4) 항목 삭제
-        JButton removeButton = new JButton("항목 삭제");
-        removeButton.setFont(ft);
-        buttonPanel.add(removeButton);
 
         removeButton.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -207,16 +266,11 @@ public class CartItemListPage extends JPanel {
 
                     mCart.removeCart(mSelectRow);
 
-                    refreshTable(cartTable, totalPricelabel, mCart);
+                    refreshTable(cartTable, totalPriceLabel, mCart);
                     mSelectRow = -1;
                 }
             }
         });
-
-        // 5) 주문하기
-        JButton orderButton = new JButton("주문하기");
-        orderButton.setFont(ft);
-        buttonPanel.add(orderButton);
 
         orderButton.addActionListener(new AbstractAction() {
             @Override
@@ -236,10 +290,7 @@ public class CartItemListPage extends JPanel {
         });
     }
 
-    // ------------------------------
-    // 테이블 및 총액 갱신 함수
-    // ------------------------------
-    private void refreshTable(JTable cartTable, JLabel totalPricelabel, Cart cart) {
+    private void refreshTable(JTable cartTable, JLabel totalPriceLabel, Cart cart) {
 
         ArrayList<CartItem> cartItemList = cart.getmCartItem();
         Object[][] content = new Object[cartItemList.size()][tableHeader.length];
@@ -261,6 +312,38 @@ public class CartItemListPage extends JPanel {
         TableModel tableModel = new DefaultTableModel(content, tableHeader);
         cartTable.setModel(tableModel);
 
-        totalPricelabel.setText("총금액: " + totalPrice + " 원");
+        CartTableCellRenderer cellRenderer = new CartTableCellRenderer();
+        for (int i = 0; i < cartTable.getColumnModel().getColumnCount(); i++) {
+            cartTable.getColumnModel().getColumn(i).setCellRenderer(cellRenderer);
+        }
+
+        totalPriceLabel.setText("총금액: " + totalPrice + " 원");
+    }
+
+    private static class CartTableCellRenderer extends DefaultTableCellRenderer {
+
+        @Override
+        public Component getTableCellRendererComponent(
+                JTable table, Object value, boolean isSelected,
+                boolean hasFocus, int row, int column) {
+
+            Component c = super.getTableCellRendererComponent(
+                    table, value, isSelected, hasFocus, row, column);
+
+            setHorizontalAlignment(SwingConstants.LEFT);
+            setBorder(new EmptyBorder(0, 8, 0, 8));
+
+            if (isSelected) {
+                c.setBackground(new Color(255, 245, 230));
+            } else {
+                if (row % 2 == 0) {
+                    c.setBackground(Color.WHITE);
+                } else {
+                    c.setBackground(new Color(250, 250, 250));
+                }
+            }
+
+            return c;
+        }
     }
 }

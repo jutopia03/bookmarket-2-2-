@@ -22,10 +22,10 @@ public class OrderListPanel extends JPanel {
     private List<Order> allOrders = new ArrayList<>();
 
     // 검색/필터/정렬용
-    private JComboBox<String> cbField;     // 전체 / 주문번호 / 회원ID / 아이디
-    private JTextField tfKeyword;          // 검색어
-    private JComboBox<String> cbStatus;    // 상태: 전체 / ORDERED / CANCELED
-    private JComboBox<String> cbSort;      // 정렬: 최신, 오래된, 금액높은, 금액낮은
+    private JComboBox<String> cbField;     
+    private JTextField tfKeyword;         
+    private JComboBox<String> cbStatus;   
+    private JComboBox<String> cbSort;      
 
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
@@ -42,8 +42,8 @@ public class OrderListPanel extends JPanel {
         // ===== 검색/정렬 영역 =====
         cbSort = new JComboBox<>(new String[]{
                 "정렬 없음",
-                "최신 순",    // order_date DESC
-                "오래된 순",  // order_date ASC
+                "최신 순",    
+                "오래된 순", 
                 "금액 높은 순",
                 "금액 낮은 순"
         });

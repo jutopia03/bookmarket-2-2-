@@ -29,7 +29,6 @@ public class BookDAO {
                 String releaseDate = rs.getString("release_date");
                 int stock = rs.getInt("stock");
                 
-                // Book 클래스의 두 번째 생성자 사용
                 Book book = new Book(
                         bookId,
                         name,
@@ -95,7 +94,7 @@ public class BookDAO {
         return null;
     }
     
- // 도서 추가
+    // 도서 추가
     public int insertBook(Book book) {
         String sql = "INSERT INTO book (" +
                      "book_id, name, unit_price, author, description, category, release_date, stock" +
@@ -122,7 +121,7 @@ public class BookDAO {
 
         return 0; 
     }
- // 도서 수정
+    // 도서 수정
     public int updateBook(Book book) {
         String sql = "UPDATE book SET " +
                      "name = ?, " +
@@ -143,10 +142,10 @@ public class BookDAO {
             pstmt.setString(4, book.getDescription());
             pstmt.setString(5, book.getCategory());
             pstmt.setString(6, book.getReleaseDate());
-            pstmt.setInt(7, book.getStock());   // Book 클래스에 맞게 수정
-            pstmt.setString(8, book.getBookId());      // WHERE 조건 (PK)
+            pstmt.setInt(7, book.getStock());
+            pstmt.setString(8, book.getBookId());
 
-            return pstmt.executeUpdate();  // 수정된 행 개수(보통 1)
+            return pstmt.executeUpdate();
 
         } catch (SQLException e) {
             System.out.println("updateBook 오류");
@@ -155,7 +154,7 @@ public class BookDAO {
 
         return 0;
     }
- // 도서 삭제
+    // 도서 삭제
     public int deleteBook(String bookId) {
         String sql = "DELETE FROM book WHERE book_id = ?";
 

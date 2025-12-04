@@ -21,7 +21,7 @@ public class BookInIt {
             BufferedReader reader = new BufferedReader(
                 new InputStreamReader(
                     new FileInputStream("book.txt"),
-                    Charset.forName("MS949")   // ← 인코딩 지정
+                    Charset.forName("MS949")
                 )
             )
         ) {
@@ -43,7 +43,7 @@ public class BookInIt {
             BufferedReader reader = new BufferedReader(
                 new InputStreamReader(
                     new FileInputStream("book.txt"),
-                    Charset.forName("MS949")   // ← 여기도 동일하게
+                    Charset.forName("MS949")
                 )
             )
         ) {

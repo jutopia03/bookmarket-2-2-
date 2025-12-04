@@ -80,9 +80,8 @@ public class AdminLoginDialog extends JDialog {
 		        Admin admin = memberDAO.loginAdmin(id, pw);
 
 		        if (admin != null) {
-		            // 로그인 성공
-		            isLogin = true;   // 성공 여부만 기록
-		            dispose();        // 다이얼로그만 닫기
+		            isLogin = true;  
+		            dispose();       
 		        } else {
 		            JOptionPane.showMessageDialog(okButton, "관리자 정보가 일치하지 않습니다");
 		        }

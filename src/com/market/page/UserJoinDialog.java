@@ -2,9 +2,9 @@ package com.market.page;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
 
-import com.market.member.*;
+import com.market.member.MemberDAO;
 
 public class UserJoinDialog extends JDialog {
 
@@ -19,103 +19,171 @@ public class UserJoinDialog extends JDialog {
     public UserJoinDialog(JDialog owner) {
         super(owner, "회원가입", true);
 
-        setLayout(null);
-        setSize(450, 350);
+        Font titleFont = new Font("함초롬돋움", Font.BOLD, 20);
+        Font subFont   = new Font("함초롬돋움", Font.PLAIN, 12);
+        Font labelFont = new Font("함초롬돋움", Font.PLAIN, 14);
+        Font btnFont   = new Font("함초롬돋움", Font.BOLD, 14);
 
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation((screenSize.width - 450) / 2, (screenSize.height - 350) / 2);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setSize(700, 420);
+        setResizable(false);
+        setLayout(new BorderLayout());
 
-        Font ft = new Font("맑은 고딕", Font.PLAIN, 14);
+        JPanel leftPanel = new JPanel();
+        leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
+        leftPanel.setBackground(new Color(20, 20, 20));
+        leftPanel.setPreferredSize(new Dimension(230, 0));
+        leftPanel.setBorder(BorderFactory.createEmptyBorder(30, 25, 25, 25));
 
-        // 라벨 폭 통일용
-        Dimension labelSize = new Dimension(80, 25);
+        JLabel iconLabel = new JLabel();
+        iconLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        ImageIcon icon = new ImageIcon("./images/shop.png");
+        if (icon.getIconWidth() > 0) {
+            iconLabel.setIcon(icon);
+        }
 
-        int y = 20;
+        JLabel brandLabel = new JLabel("Book Market");
+        brandLabel.setForeground(Color.WHITE);
+        brandLabel.setFont(new Font("함초롬돋움", Font.BOLD, 22));
+        brandLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel msgLabel = new JLabel("<html>계정을 만들어<br/>Book Market을 시작해 보세요.</html>");
+        msgLabel.setForeground(new Color(220, 220, 220));
+        msgLabel.setFont(new Font("함초롬돋움", Font.PLAIN, 13));
+        msgLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        leftPanel.add(Box.createVerticalStrut(20));
+        leftPanel.add(iconLabel);
+        leftPanel.add(Box.createVerticalStrut(15));
+        leftPanel.add(brandLabel);
+        leftPanel.add(Box.createVerticalStrut(15));
+        leftPanel.add(msgLabel);
+        leftPanel.add(Box.createVerticalGlue());
+
+        add(leftPanel, BorderLayout.WEST);
+
+        // 오른쪽: 제목 + 폼 카드
+        JPanel rightWrapper = new JPanel(new BorderLayout());
+        rightWrapper.setBackground(new Color(245, 245, 245));
+        rightWrapper.setBorder(BorderFactory.createEmptyBorder(25, 30, 25, 30));
+        add(rightWrapper, BorderLayout.CENTER);
+
+        // 상단 제목
+        JPanel titlePanel = new JPanel();
+        titlePanel.setLayout(new BoxLayout(titlePanel, BoxLayout.Y_AXIS));
+        titlePanel.setBackground(rightWrapper.getBackground());
+
+        JLabel titleLabel = new JLabel("회원가입");
+        titleLabel.setFont(titleFont);
+
+        JLabel subLabel = new JLabel("아래 정보를 입력하고 Book Market 계정을 생성하세요.");
+        subLabel.setFont(subFont);
+        subLabel.setForeground(new Color(120, 120, 120));
+
+        titlePanel.add(titleLabel);
+        titlePanel.add(Box.createVerticalStrut(5));
+        titlePanel.add(subLabel);
+        titlePanel.add(Box.createVerticalStrut(15));
+
+        rightWrapper.add(titlePanel, BorderLayout.NORTH);
+
+        // 폼 카드
+        JPanel formCard = new JPanel(new GridBagLayout());
+        formCard.setBackground(Color.WHITE);
+        formCard.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(225, 225, 225)),
+                BorderFactory.createEmptyBorder(20, 25, 20, 25)
+        ));
+        rightWrapper.add(formCard, BorderLayout.CENTER);
+
+        GridBagConstraints gc = new GridBagConstraints();
+        gc.insets = new Insets(5, 0, 5, 0);
+        gc.fill = GridBagConstraints.HORIZONTAL;
+
+        int row = 0;
 
         // 아이디
-        JPanel idPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        idPanel.setBounds(0, y, 450, 30);
-        JLabel idLabel = new JLabel("아이디 : ");
-        idLabel.setFont(ft);
-        idLabel.setPreferredSize(labelSize);
-        idField = new JTextField(25);
-        idField.setFont(ft);
-        idPanel.add(idLabel);
-        idPanel.add(idField);
-        add(idPanel);
-
-        y += 40;
+        idField = new JTextField(20);
+        idField.setFont(labelFont);
+        addFormRow(formCard, gc, row++, "아이디", labelFont, idField);
 
         // 비밀번호
-        JPanel pwPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        pwPanel.setBounds(0, y, 450, 30);
-        JLabel pwLabel = new JLabel("비밀번호 : ");
-        pwLabel.setFont(ft);
-        pwLabel.setPreferredSize(labelSize);
-        pwField = new JPasswordField(25);
-        pwField.setFont(ft);
-        pwPanel.add(pwLabel);
-        pwPanel.add(pwField);
-        add(pwPanel);
-
-        y += 40;
+        pwField = new JPasswordField(20);
+        pwField.setFont(labelFont);
+        addFormRow(formCard, gc, row++, "비밀번호", labelFont, pwField);
 
         // 이름
-        JPanel namePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        namePanel.setBounds(0, y, 450, 30);
-        JLabel nameLabel = new JLabel("이름 : ");
-        nameLabel.setFont(ft);
-        nameLabel.setPreferredSize(labelSize);
-        nameField = new JTextField(25);
-        nameField.setFont(ft);
-        namePanel.add(nameLabel);
-        namePanel.add(nameField);
-        add(namePanel);
-
-        y += 40;
+        nameField = new JTextField(20);
+        nameField.setFont(labelFont);
+        addFormRow(formCard, gc, row++, "이름", labelFont, nameField);
 
         // 전화번호
-        JPanel phonePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        phonePanel.setBounds(0, y, 450, 30);
-        JLabel phoneLabel = new JLabel("전화번호 : ");
-        phoneLabel.setFont(ft);
-        phoneLabel.setPreferredSize(labelSize);
-        phoneField = new JTextField(25);
-        phoneField.setFont(ft);
-        phonePanel.add(phoneLabel);
-        phonePanel.add(phoneField);
-        add(phonePanel);
-
-        y += 40;
+        phoneField = new JTextField(20);
+        phoneField.setFont(labelFont);
+        addFormRow(formCard, gc, row++, "전화번호", labelFont, phoneField);
 
         // 주소
-        JPanel addrPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        addrPanel.setBounds(0, y, 450, 30);
-        JLabel addrLabel = new JLabel("주소 : ");
-        addrLabel.setFont(ft);
-        addrLabel.setPreferredSize(labelSize);
-        addrField = new JTextField(25);
-        addrField.setFont(ft);
-        addrPanel.add(addrLabel);
-        addrPanel.add(addrField);
-        add(addrPanel);
+        addrField = new JTextField(20);
+        addrField.setFont(labelFont);
+        addFormRow(formCard, gc, row++, "주소", labelFont, addrField);
 
-        y += 50;
+        // 하단 버튼
+        JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        btnPanel.setBackground(rightWrapper.getBackground());
+        btnPanel.setBorder(BorderFactory.createEmptyBorder(15, 0, 0, 0));
+        rightWrapper.add(btnPanel, BorderLayout.SOUTH);
 
-        // 버튼
-        JPanel btnPanel = new JPanel();
-        btnPanel.setBounds(0, y, 450, 40);
         JButton joinBtn = new JButton("가입");
+        joinBtn.setFont(btnFont);
+        joinBtn.setPreferredSize(new Dimension(100, 36));
+        joinBtn.setBackground(new Color(255, 107, 0));
+        joinBtn.setForeground(Color.WHITE);
+        joinBtn.setFocusPainted(false);
+        joinBtn.setBorderPainted(false);
+        joinBtn.setContentAreaFilled(true);
+        joinBtn.setOpaque(true);
+
         JButton cancelBtn = new JButton("취소");
-        btnPanel.add(joinBtn);
+        cancelBtn.setFont(btnFont);
+        cancelBtn.setPreferredSize(new Dimension(100, 36));
+        cancelBtn.setBackground(new Color(245, 245, 245));
+        cancelBtn.setForeground(new Color(60, 60, 60));
+        cancelBtn.setFocusPainted(false);
+        cancelBtn.setBorder(BorderFactory.createLineBorder(new Color(210, 210, 210)));
+        cancelBtn.setContentAreaFilled(true);
+        cancelBtn.setOpaque(true);
+
         btnPanel.add(cancelBtn);
-        add(btnPanel);
+        btnPanel.add(joinBtn);
 
         joinBtn.addActionListener(e -> join());
         cancelBtn.addActionListener(e -> dispose());
 
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        addrField.addActionListener((ActionEvent e) -> join());
+
+        setLocationRelativeTo(owner);
         setVisible(true);
+    }
+
+    private void addFormRow(JPanel parent, GridBagConstraints gc, int row,
+                            String labelText, Font labelFont, JComponent field) {
+
+        gc.gridx = 0;
+        gc.gridy = row;
+        gc.weightx = 0;
+        JLabel label = new JLabel(labelText + " : ");
+        label.setFont(labelFont);
+        label.setPreferredSize(new Dimension(70, 24));
+        label.setHorizontalAlignment(SwingConstants.RIGHT);
+        parent.add(label, gc);
+
+        gc.gridx = 1;
+        gc.weightx = 1.0;
+        field.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(220, 220, 220)),
+                BorderFactory.createEmptyBorder(4, 6, 4, 6)
+        ));
+        parent.add(field, gc);
     }
 
     private void join() {
