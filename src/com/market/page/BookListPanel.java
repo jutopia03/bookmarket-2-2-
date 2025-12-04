@@ -24,7 +24,7 @@ public class BookListPanel extends JPanel {
     private JComboBox<String> cbSort;
 
     public BookListPanel() {
-
+    	
         // 패널 전체 흰색
         setBackground(Color.WHITE);
         setOpaque(true);

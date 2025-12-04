@@ -1,144 +1,209 @@
 package com.market.page;
 
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+
 import com.market.bookitem.Book;
 import com.market.bookitem.BookInIt;
 import com.market.cart.Cart;
-import java.awt.*;
-import java.util.ArrayList;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 
 public class CartAddItemPage extends JPanel {
 
-	ImageIcon imageBook;
-	int mSelectRow = 0;
+    private JPanel parentPanel;
+    private Cart mCart;
+    private JTable table;
+    private JLabel imageLabel;
+    private JLabel selectedInfoLabel;
 
-	Cart mCart;
+    private ArrayList<Book> bookList;
+    private int selectedRow = -1;
 
-	public CartAddItemPage(JPanel panel, Cart cart) {
-		Font ft;
-		ft = new Font("함초롬돋움", Font.BOLD, 15);
+    public CartAddItemPage(JPanel panel, Cart cart) {
 
-		setLayout(null);
+        this.parentPanel = panel;
+        this.mCart = cart;
 
-		Rectangle rect = panel.getBounds();
-		System.out.println(rect);
-		setPreferredSize(rect.getSize());
+        setLayout(new BorderLayout());
+        Font ft = new Font("함초롬돋움", Font.BOLD, 15);
 
-		mCart = cart;
+        // ============================
+        // 상단 제목
+        // ============================
+        JLabel titleLabel = new JLabel("도서 목록", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("함초롬돋움", Font.BOLD, 22));
 
-		JPanel imagePanel = new JPanel();
-		imagePanel.setBounds(20, 0, 300, 400);
-		imageBook = new ImageIcon("./images/ISBN1234.jpg");
-		imageBook.setImage(imageBook.getImage().getScaledInstance(250, 300, Image.SCALE_DEFAULT));
-		JLabel label = new JLabel(imageBook);
-		imagePanel.add(label);
-		add(imagePanel);
+        JPanel titlePanel = new JPanel(new BorderLayout());
+        titlePanel.setBackground(UIManager.getColor("Panel.background"));
+        titlePanel.add(titleLabel, BorderLayout.CENTER);
 
-		JPanel tablePanel = new JPanel();
-		tablePanel.setBounds(300, 0, 700, 400);
-		add(tablePanel);
+        add(titlePanel, BorderLayout.NORTH);
 
-		ArrayList<Book> booklist = BookInIt.getmBookList();
-		Object[] tableHeader = { "도서ID", "도서명", "가격", "저자", "설명", "분야", "출판일" };
-		Object[][] content = new Object[booklist.size()][tableHeader.length];
-		for (int i = 0; i < booklist.size(); i++) {
-			Book bookitem = booklist.get(i);
-			content[i][0] = bookitem.getBookId();
-			content[i][1] = bookitem.getName();
-			content[i][2] = bookitem.getUnitPrice();
-			content[i][3] = bookitem.getAuthor();
-			content[i][4] = bookitem.getDescription();
-			content[i][5] = bookitem.getCategory();
-			content[i][6] = bookitem.getReleaseDate();
+        // 1) 도서 목록 로딩
+        bookList = BookInIt.getmBookList();
+        if (bookList == null) {
+            bookList = new ArrayList<>();
+        }
 
-		}
+        // ============================
+        // 왼쪽 이미지 영역
+        // ============================
+        JPanel imagePanel = new JPanel();
+        imagePanel.setBorder(BorderFactory.createEmptyBorder(-40, 150, 0, 0));
+        imagePanel.setPreferredSize(new Dimension(220, 260));
+        imageLabel = new JLabel();
+        imagePanel.add(imageLabel);
+        imagePanel.setPreferredSize(new Dimension(400, 500));
+        imageLabel.setPreferredSize(new Dimension(400, 500));
+        setBookImage(null);
 
-		JTable bookTable = new JTable(content, tableHeader);
-		if (bookTable.getRowCount() > 0) {
-			bookTable.setRowSelectionInterval(0, 0);
-		} else {
-		    javax.swing.JOptionPane.showMessageDialog(this,
-		        "현재 등록된 도서가 없습니다.\n관리자 페이지에서 도서를 먼저 추가해 주세요.",
-		        "알림",
-		        javax.swing.JOptionPane.INFORMATION_MESSAGE);
-		}
-		bookTable.getSelectedColumn();
-		JScrollPane jScrollPane = new JScrollPane();
-		jScrollPane.setPreferredSize(new Dimension(600, 350));
-		jScrollPane.setViewportView(bookTable);
-		tablePanel.add(jScrollPane);
+        // ============================
+        // 오른쪽 도서 테이블
+        // ============================
+        String[] colNames = { "ID", "제목", "가격" };
+        Object[][] rowData = new Object[bookList.size()][3];
 
-		JPanel buttonPanel = new JPanel();
-		buttonPanel.setBounds(0, 400, 1000, 400);
-		add(buttonPanel);
-		JLabel buttonLabel = new JLabel("장바구니에 담기");
-		buttonLabel.setFont(ft);
-		JButton addButton = new JButton();
-		addButton.add(buttonLabel);
-		buttonPanel.add(addButton);
+        for (int i = 0; i < bookList.size(); i++) {
+            Book b = bookList.get(i);
+            rowData[i][0] = b.getBookId();
+            rowData[i][1] = b.getName();
+            rowData[i][2] = b.getUnitPrice();
+        }
 
-		bookTable.addMouseListener(new MouseListener() {
+        table = new JTable(rowData, colNames);
+        table.setPreferredScrollableViewportSize(new Dimension(500, 400));
 
-			public void mouseClicked(MouseEvent e) {
-				int row = bookTable.getSelectedRow();
-				int col = bookTable.getSelectedColumn();
-				mSelectRow = row;
-				Object value = bookTable.getValueAt(row, 0);
-				String str = value + ".jpg";
+        JScrollPane scrollPane = new JScrollPane(table);
 
-				imageBook = new ImageIcon("./images/" + str);
-				imageBook.setImage(imageBook.getImage().getScaledInstance(250, 300, Image.SCALE_DEFAULT));
-				JLabel label = new JLabel(imageBook);
-				imagePanel.removeAll();
-				imagePanel.add(label);
-				imagePanel.revalidate();
-				imagePanel.repaint();
-			}
+        JPanel tableWrapper = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        tableWrapper.add(scrollPane);
 
-			@Override
-			public void mousePressed(MouseEvent e) {
-				// TODO Auto-generated method stub
-			}
+        // ============================
+        // 가운데: 이미지 + 테이블
+        // ============================
+        JPanel rowPanel = new JPanel();
+        rowPanel.setLayout(new BoxLayout(rowPanel, BoxLayout.X_AXIS));
 
-			@Override
-			public void mouseReleased(MouseEvent e) {
-				// TODO Auto-generated method stub
-			}
+        rowPanel.add(Box.createHorizontalGlue());
+        rowPanel.add(imagePanel);
+        rowPanel.add(Box.createHorizontalStrut(10));
+        rowPanel.add(tableWrapper);
+        rowPanel.add(Box.createHorizontalGlue());
 
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				// TODO Auto-generated method stub
-			}
+        JPanel centerPanel = new JPanel();
+        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
+        centerPanel.setBorder(BorderFactory.createEmptyBorder(40, 0, 0, 0));
 
-			@Override
-			public void mouseExited(MouseEvent e) {
-				// TODO Auto-generated method stub
-			}
-		});
+        centerPanel.add(Box.createVerticalGlue());
+        centerPanel.add(rowPanel);
+        centerPanel.add(Box.createVerticalGlue());
 
-		addButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+        add(centerPanel, BorderLayout.CENTER);
 
-				ArrayList<Book> booklist = BookInIt.getmBookList();
-				int select = JOptionPane.showConfirmDialog(addButton, "장바구니에 추가하겠습니까?");
-				if (select == 0) {
-					int numId = mSelectRow;
-					if (!isCartInBook(booklist.get(numId).getBookId())) {
-						mCart.insertBook(booklist.get(numId));
-					}
-					JOptionPane.showMessageDialog(addButton, "추가했습니다");
-				}
-			}
-		});
+        // ============================
+        // 선택된 도서 정보 라벨
+        // ============================
+        selectedInfoLabel = new JLabel("선택된 도서가 없습니다.");
+        selectedInfoLabel.setFont(ft);
+        selectedInfoLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        selectedInfoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-	}
+        // 테이블 클릭 시 정보 업데이트
+        table.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                selectedRow = table.getSelectedRow();
+                if (selectedRow >= 0) {
+                    String bookId = (String) table.getValueAt(selectedRow, 0);
+                    String title  = (String) table.getValueAt(selectedRow, 1);
+                    int price     = (Integer) table.getValueAt(selectedRow, 2);
 
-	public boolean isCartInBook(String bookId) {
-		return mCart.isCartInBook(bookId);
-	}
+                    setBookImage(bookId);
 
+                    selectedInfoLabel.setText(
+                            "선택한 도서: " + bookId + " / " + title + " / " + price + "원"
+                    );
+                }
+            }
+        });
+
+        // ============================
+        // 하단 버튼
+        // ============================
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 5));
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 20, 0));
+        JButton addBtn = new JButton("장바구니에 담기");
+        addBtn.setFont(ft);
+        buttonPanel.add(addBtn);
+
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
+        bottomPanel.add(selectedInfoLabel);
+        bottomPanel.add(Box.createVerticalStrut(5));
+        bottomPanel.add(buttonPanel);
+
+        add(bottomPanel, BorderLayout.SOUTH);
+
+        // 장바구니 담기 기능
+        addBtn.addActionListener(e -> {
+            if (selectedRow < 0) {
+                JOptionPane.showMessageDialog(addBtn, "추가할 도서를 먼저 선택하세요.");
+                return;
+            }
+
+            Book selectedBook = bookList.get(selectedRow);
+
+            int select = JOptionPane.showConfirmDialog(
+                    addBtn,
+                    "선택한 도서\n[" + selectedBook.getBookId() + "] "
+                            + selectedBook.getName() + " (" + selectedBook.getUnitPrice() + "원)\n\n"
+                            + "을(를) 장바구니에 추가하시겠습니까?",
+                    "확인",
+                    JOptionPane.YES_NO_OPTION
+            );
+
+            if (select == JOptionPane.YES_OPTION) {
+                if (!mCart.isCartInBook(selectedBook.getBookId())) {
+                    mCart.insertBook(selectedBook);
+                    JOptionPane.showMessageDialog(addBtn, "장바구니에 추가되었습니다.");
+                } else {
+                    JOptionPane.showMessageDialog(addBtn, "이미 장바구니에 있는 도서입니다.");
+                }
+            }
+        });
+    }
+
+    private void setBookImage(String bookId) {
+        String path;
+
+        if (bookId == null) {
+            path = "./images/default.jpg";
+        } else {
+            path = "./images/" + bookId + ".jpg";
+        }
+
+        ImageIcon originalIcon = new ImageIcon(path);
+
+        if (originalIcon.getIconWidth() <= 0) {
+            originalIcon = new ImageIcon("./images/default.jpg");
+        }
+
+        int ow = originalIcon.getIconWidth();
+        int oh = originalIcon.getIconHeight();
+
+        int maxW = 240;
+        int maxH = 300;
+
+        double scale = Math.min((double) maxW / ow, (double) maxH / oh);
+
+        int nw = (int) (ow * scale);
+        int nh = (int) (oh * scale);
+
+        Image scaledImg = originalIcon.getImage().getScaledInstance(nw, nh, Image.SCALE_SMOOTH);
+        ImageIcon scaledIcon = new ImageIcon(scaledImg);
+
+        imageLabel.setIcon(scaledIcon);
+    }
 }

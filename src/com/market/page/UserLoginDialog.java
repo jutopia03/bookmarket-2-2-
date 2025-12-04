@@ -25,26 +25,34 @@ public class UserLoginDialog extends JDialog {
 
         Font ft = new Font("맑은 고딕", Font.PLAIN, 16);
 
-        JPanel idPanel = new JPanel();
-        idPanel.setBounds(0, 30, 400, 40);
+        // 라벨 폭을 맞추기 위한 공통 크기
+        Dimension labelSize = new Dimension(80, 25);
+
+        // 아이디 패널
+        JPanel idPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        idPanel.setBounds(40, 30, 400, 40);
         JLabel idLabel = new JLabel("아이디 : ");
         idLabel.setFont(ft);
+        idLabel.setPreferredSize(labelSize);   // 라벨 폭 고정
         idField = new JTextField(15);
         idField.setFont(ft);
         idPanel.add(idLabel);
         idPanel.add(idField);
         add(idPanel);
 
-        JPanel pwPanel = new JPanel();
-        pwPanel.setBounds(0, 80, 400, 40);
+        // 비밀번호 패널
+        JPanel pwPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        pwPanel.setBounds(40, 80, 400, 40);
         JLabel pwLabel = new JLabel("비밀번호 : ");
         pwLabel.setFont(ft);
+        pwLabel.setPreferredSize(labelSize);   // 라벨 폭 고정
         pwField = new JPasswordField(15);
         pwField.setFont(ft);
         pwPanel.add(pwLabel);
         pwPanel.add(pwField);
         add(pwPanel);
 
+        // 버튼 패널
         JPanel btnPanel = new JPanel();
         btnPanel.setBounds(0, 140, 400, 40);
 

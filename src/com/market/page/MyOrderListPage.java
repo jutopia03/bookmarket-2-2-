@@ -22,13 +22,22 @@ public class MyOrderListPage extends JPanel {
     public MyOrderListPage(JPanel panel) {
 
         setLayout(new BorderLayout(10, 10));
-        setBackground(Color.WHITE);
 
+        // --------------------------
+        // 제목
+        // --------------------------
         JLabel title = new JLabel("내 주문 내역", SwingConstants.CENTER);
         title.setFont(new Font("함초롬돋움", Font.BOLD, 22));
 
-        add(title, BorderLayout.NORTH);
+        JPanel titlePanel = new JPanel(new BorderLayout());
+        titlePanel.setBackground(UIManager.getColor("Panel.background"));
+        titlePanel.add(title, BorderLayout.CENTER);
 
+        add(titlePanel, BorderLayout.NORTH);
+
+        // --------------------------
+        // 테이블
+        // --------------------------
         String[] columns = {
                 "주문번호", "총 금액", "주문일시", "상태"
         };
@@ -41,17 +50,43 @@ public class MyOrderListPage extends JPanel {
         };
 
         table = new JTable(model);
-        JScrollPane sp = new JScrollPane(table);
-        add(sp, BorderLayout.CENTER);
 
+        // ★ 테이블이 차지할 '보이는 영역' 크기 설정
+        // (실제 데이터 행 수와는 상관없이, 기본 보이는 크기)
+        table.setPreferredScrollableViewportSize(new Dimension(700, 250));
+
+        JScrollPane sp = new JScrollPane(table);
+
+        // ★ 테두리(선) 완전히 제거
+        sp.setBorder(BorderFactory.createEmptyBorder());
+        sp.getViewport().setBorder(null);
+
+        // ★ BorderLayout.CENTER에 바로 넣지 말고
+        //    가운데 패널(FlowLayout)에 넣어서 크기를 그대로 사용하게 함
+        JPanel centerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 10));
+        centerPanel.setBackground(UIManager.getColor("Panel.background"));
+        centerPanel.add(sp);
+
+        add(centerPanel, BorderLayout.CENTER);
+
+        // --------------------------
+        // 하단 버튼
+        // --------------------------
         JPanel btnPanel = new JPanel();
-        btnPanel.setBackground(Color.WHITE);
+        btnPanel.setBackground(UIManager.getColor("Panel.background"));
+        btnPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 20, 0));
+
         JButton btnDetail = new JButton("주문 상세 보기");
+        btnDetail.setPreferredSize(new Dimension(160, 45));
+        btnDetail.setFont(new Font("함초롬돋움", Font.BOLD, 14));
+
         btnPanel.add(btnDetail);
 
         add(btnPanel, BorderLayout.SOUTH);
 
-        // 상세 보기
+        // --------------------------
+        // 상세보기 동작
+        // --------------------------
         btnDetail.addActionListener(e -> showDetail());
 
         loadMyOrders();

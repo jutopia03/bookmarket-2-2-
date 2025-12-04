@@ -27,13 +27,18 @@ public class UserJoinDialog extends JDialog {
 
         Font ft = new Font("맑은 고딕", Font.PLAIN, 14);
 
+        // 라벨 폭 통일용
+        Dimension labelSize = new Dimension(80, 25);
+
         int y = 20;
 
-        JPanel idPanel = new JPanel();
+        // 아이디
+        JPanel idPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         idPanel.setBounds(0, y, 450, 30);
         JLabel idLabel = new JLabel("아이디 : ");
         idLabel.setFont(ft);
-        idField = new JTextField(20);
+        idLabel.setPreferredSize(labelSize);
+        idField = new JTextField(25);
         idField.setFont(ft);
         idPanel.add(idLabel);
         idPanel.add(idField);
@@ -41,11 +46,13 @@ public class UserJoinDialog extends JDialog {
 
         y += 40;
 
-        JPanel pwPanel = new JPanel();
+        // 비밀번호
+        JPanel pwPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         pwPanel.setBounds(0, y, 450, 30);
         JLabel pwLabel = new JLabel("비밀번호 : ");
         pwLabel.setFont(ft);
-        pwField = new JPasswordField(20);
+        pwLabel.setPreferredSize(labelSize);
+        pwField = new JPasswordField(25);
         pwField.setFont(ft);
         pwPanel.add(pwLabel);
         pwPanel.add(pwField);
@@ -53,11 +60,13 @@ public class UserJoinDialog extends JDialog {
 
         y += 40;
 
-        JPanel namePanel = new JPanel();
+        // 이름
+        JPanel namePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         namePanel.setBounds(0, y, 450, 30);
         JLabel nameLabel = new JLabel("이름 : ");
         nameLabel.setFont(ft);
-        nameField = new JTextField(20);
+        nameLabel.setPreferredSize(labelSize);
+        nameField = new JTextField(25);
         nameField.setFont(ft);
         namePanel.add(nameLabel);
         namePanel.add(nameField);
@@ -65,11 +74,13 @@ public class UserJoinDialog extends JDialog {
 
         y += 40;
 
-        JPanel phonePanel = new JPanel();
+        // 전화번호
+        JPanel phonePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         phonePanel.setBounds(0, y, 450, 30);
         JLabel phoneLabel = new JLabel("전화번호 : ");
         phoneLabel.setFont(ft);
-        phoneField = new JTextField(20);
+        phoneLabel.setPreferredSize(labelSize);
+        phoneField = new JTextField(25);
         phoneField.setFont(ft);
         phonePanel.add(phoneLabel);
         phonePanel.add(phoneField);
@@ -77,10 +88,12 @@ public class UserJoinDialog extends JDialog {
 
         y += 40;
 
-        JPanel addrPanel = new JPanel();
+        // 주소
+        JPanel addrPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         addrPanel.setBounds(0, y, 450, 30);
         JLabel addrLabel = new JLabel("주소 : ");
         addrLabel.setFont(ft);
+        addrLabel.setPreferredSize(labelSize);
         addrField = new JTextField(25);
         addrField.setFont(ft);
         addrPanel.add(addrLabel);
@@ -89,6 +102,7 @@ public class UserJoinDialog extends JDialog {
 
         y += 50;
 
+        // 버튼
         JPanel btnPanel = new JPanel();
         btnPanel.setBounds(0, y, 450, 40);
         JButton joinBtn = new JButton("가입");

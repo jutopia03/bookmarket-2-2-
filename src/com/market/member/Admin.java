@@ -6,7 +6,7 @@ public class Admin extends Person {
     private String address;    
     private String role;       
 
-    public Admin(String username, String name, int phone, String address, String role) {
+    public Admin(String username, String name, String phone, String address, String role) {
         super(name, phone);
         this.username = username;
         this.address = address;
