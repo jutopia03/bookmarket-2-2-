@@ -244,6 +244,10 @@ public class BookListPanel extends JPanel {
     }
 
     private void openBookForm(Book origin) {
-
+        JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(this);
+        BookFormDialog dialog = new BookFormDialog(frame, origin);
+        dialog.setVisible(true);
+        loadBooks();
     }
+
 }
