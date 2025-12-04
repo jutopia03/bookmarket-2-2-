@@ -291,10 +291,8 @@ public class MemberListPanel extends JPanel {
         dialog.setLayout(new BorderLayout(10, 10));
         dialog.getRootPane().setBorder(
                 BorderFactory.createEmptyBorder(15, 15, 15, 15));
-        dialog.getContentPane().setBackground(Color.WHITE);
 
         JPanel form = new JPanel(new GridLayout(6, 2, 10, 10));
-        form.setBackground(Color.WHITE);
 
         JTextField tfUsername     = new JTextField();
         JPasswordField pfPassword = new JPasswordField();
@@ -329,7 +327,6 @@ public class MemberListPanel extends JPanel {
         }
 
         JPanel bottom = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        bottom.setBackground(Color.WHITE);
         JButton btnSave   = new JButton("저장");
         JButton btnCancel = new JButton("취소");
         bottom.add(btnSave);
